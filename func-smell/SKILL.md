@@ -10,37 +10,37 @@ A function is a contract: given these inputs, produce this output or effect. Whe
 
 ## When to Use
 - Functions with >4 parameters or >50 lines
-- Boolean parameters that toggle behavior (`process(orders, dryRun)` )
+- Boolean parameters that toggle behavior (`process(orders, dry_run)`)
 - Functions doing I/O, validation, and business logic in one body
-- Deeply nested code (>3 levels of `if`/`for`/`try`)
-- Functions modifying input parameters via pointers/references
+- Deeply nested code (>3 levels of `if`/`for`/`match`)
+- Functions taking `&mut` output parameters instead of returning values
 
 ## Rules Engine
 
-1. **Parameter Budget** — 3 is great, 4 is suspect, 5+ demands a parameter object or functional split. Each parameter is a dimension of coupling; every flag doubles the states to test.
+1. **Parameter Budget** — 3 is great, 4 is suspect, 5+ demands a config struct or a functional split. Each parameter is a dimension of coupling; every flag doubles the states to test.
 
-2. **No Boolean Flags** — `save(order, true)` means nothing at the call site. Split into `saveOrder(order)` and `saveOrderDryRun(order)`, or use a config struct. Boolean flags are the #1 signal that a function is really two functions in a trench coat.
+2. **No Boolean Flags** — `save(order, true)` means nothing at the call site. Split into `save()` and `save_dry_run()`, take a config struct, or use an enum (`enum Mode { Real, DryRun }`). Boolean flags are the #1 signal that a function is really two functions in a trench coat.
 
-3. **One Level of Abstraction** — A function should not mix `openFile()` with `computeTax()` with `sendEmail()`. Either it orchestrates (calls high-level steps) or it computes (pure logic). Never both in the same function body.
+3. **One Level of Abstraction** — A function should not mix `open_file()` with `compute_tax()` with `send_email()`. Either it orchestrates (calls high-level steps) or it computes (pure logic). Never both in the same function body.
 
-4. **Depth Budget** — Nesting beyond 3 levels (`if` inside `for` inside `if` inside `try`) is unreadable. Extract inner logic to named functions; the name documents the purpose and the structure flattens.
+4. **Depth Budget** — Nesting beyond 3 levels (`if` inside `for` inside `match` inside `if`) is unreadable. Extract inner logic to named functions; the name documents the purpose and the structure flattens. Guard clauses (`if invalid { return }`) flatten the happy path.
 
-5. **Side Effect Declaration** — If a function writes to a DB, publishes to a queue, or mutates a global, its name MUST reveal it. `getUser()` that updates a cache is a lie; `fetchAndCacheUser()` is honest.
+5. **Side Effect Declaration** — If a function writes to a DB, sends on a channel, or mutates a global, its name MUST reveal it. `get_user()` that updates a cache is a lie; `fetch_and_cache_user()` is honest. (The `naming-smell` skill owns the naming fix — `get` vs `fetch` — this rule owns the design question: should the function have the side effect at all?)
 
-6. **Command vs Query** — A function either changes state (command) OR returns data (query), never both. `pop()` is the classic violator. Split into `peek()` + `remove()` or return a copy.
+6. **Command vs Query** — A function either changes state (command) OR returns data (query), never both. `Vec::pop()` is the classic violator. Split into `last()` (query) + `truncate()` (command), or return a copy. A `fn process(&mut self) -> Stats` that both mutates and reports is two responsibilities.
 
 ## Common Mistakes
 
 | Anti-Pattern | Fix |
 |---|---|
-| `createOrder(items, user, tx, dryRun, async, priority)` 6 params | Group into `OrderRequest` struct with meaningful field names |
-| `func process(flag bool)` — what does `process(true)` mean? | Split: `func processWithValidation()` and `func processBare()` |
-| 300-line function with 8 levels of nesting | Extract blocks into named helper functions until top-level reads like pseudocode |
-| Function named `validateAndSave()` doing both | Split into `validate()` returning errors + `save()`; call separately |
-| `func getUser(id)` that writes to metrics/updates LRU cache | Rename: `func fetchUser(id)` or document side effects in name |
-| Mutable output parameter: `func parse(s string, out *Result)` | Return `(Result, error)` by value instead |
-| Early returns mixed with deep else-if chains | Invert conditions: `if invalid { return }` flattens the happy path |
-| `doEverything()` function mixing SQL queries, JSON parsing, email sending | Extract per-responsibility: `loadOrders()`, `parseOrderBody()`, `notifyCustomer()` |
+| `create_order(items, user, tx, dry_run, async_mode, priority)` 6 params | Group into `OrderRequest` struct with named fields |
+| `fn process(flag: bool)` — what does `process(true)` mean? | Split into `fn process()` and `fn process_dry_run()`, or take `enum Mode` |
+| 300-line function with 8 levels of `match`/`if` nesting | Extract blocks into named helpers until the top level reads like pseudocode |
+| Function named `validate_and_save()` doing both | Split into `validate() -> Result<()>` and `save()`; call separately |
+| `fn get_user(id)` that writes to metrics / updates an LRU cache | Split the side effect out, or rename to `fetch_and_cache_user()` (see `naming-smell`) |
+| Mutable output parameter: `fn parse(s: &str, out: &mut Result)` | Return `Result<Parsed, Error>` by value instead |
+| `fn process(&mut self) -> Stats` mutating and reporting | Split: `fn apply(&mut self)` (command) + `fn stats(&self) -> Stats` (query) |
+| `do_everything()` mixing SQL, JSON parsing, and email | Extract per-responsibility: `load_orders()`, `parse_body()`, `notify_customer()` |
 
 ## Workflow
 1. Identify functions exceeding parameter or length budgets — flag for refactor
