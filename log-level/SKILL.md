@@ -6,50 +6,49 @@ description: Use when reviewing log levels (ERROR/WARN/INFO/DEBUG/TRACE) in code
 # Log Level Reviewer
 
 ## Overview
-INFO and above must never flood production logs. Production logs reflect only critical state changes and anomalies. High-frequency data and routine I/O belong at DEBUG/TRACE. The right level is an operator contract: ERROR pages someone, WARN surfaces a degradation worth scanning, INFO marks a lifecycle milestone, DEBUG/TRACE are for you during a fire.
+INFO+ must never flood production. Production logs = critical state changes and anomalies only; high-frequency/routine I/O belongs at DEBUG/TRACE. Level is an operator contract: ERROR pages someone, WARN surfaces a degradation worth scanning, INFO marks a lifecycle milestone, DEBUG/TRACE are for a fire.
 
 ## When to Use
-- Setting or reviewing log levels (`error!`/`warn!`/`info!`/`debug!`/`trace!`) in code
+- Setting/reviewing log levels (`error!`/`warn!`/`info!`/`debug!`/`trace!`)
 - Production log noise investigation
-- Auditing that ERROR/WARN/INFO usage follows severity semantics
+- Auditing ERROR/WARN/INFO severity semantics
 
 ## Decision Tree
 
-Apply in priority order for every log statement:
+Apply in priority order:
 
-1. **Frequency Check** — Is this in a hot loop, high-frequency request path, or periodic trigger? → Demote to DEBUG/TRACE. (Exception: first failure in a periodic task can be WARN.)
-2. **Fatal Check** — Does this event halt the process/transaction and require manual intervention (restart, config change, fix downstream)? → ERROR.
-3. **Self-healing Check** — Is this an unexpected failure with automatic retry/fallback/recovery, where the system continues to serve but degraded? → WARN. Only the *first* failure is WARN; subsequent retries are DEBUG, and final exhaustion (gave up) is ERROR.
-4. **State Transition Check** — Is this a low-frequency lifecycle event (startup/shutdown, leader election, connection pool initialized, long batch completed)? → INFO.
+1. **Frequency** — Hot loop, high-frequency path, or periodic trigger? → DEBUG/TRACE. (Exception: first failure in a periodic task = WARN.)
+2. **Fatal** — Halts process/transaction, needs manual intervention (restart, config, downstream fix)? → ERROR.
+3. **Self-healing** — Unexpected failure with auto retry/fallback, system serves degraded? → WARN. First failure only; retries = DEBUG, exhaustion = ERROR.
+4. **State transition** — Low-frequency lifecycle (startup/shutdown, election, pool init, batch done)? → INFO.
 5. **Otherwise** → DEBUG.
 
-> Note the WARN vs ERROR boundary: WARN = degraded but alive (system self-healed or is retrying); ERROR = needs a human. A retried timeout that eventually succeeds is WARN; the same timeout that exhausts retries and drops the request is ERROR.
+> WARN vs ERROR: WARN = degraded but alive (self-healed/retrying); ERROR = needs a human. Retried timeout that succeeds = WARN; same timeout exhausting retries and dropping = ERROR.
 
 ## Level Reference
 
 | Level | Semantic | Example |
 |---|---|---|
-| ERROR | Needs a human; process/transaction cannot continue | Core resource init failure, persistent dependency disconnection, retry exhaustion, data corruption |
-| WARN | Degraded but alive; anomaly scanned, not paged | First I/O timeout (will retry), circuit breaker trip, missing non-critical config, rate limit hit |
-| INFO | Low-frequency milestone (lifecycle, not per-request) | Server listening, batch job start/end, connection pool initialized, config hot-reload success |
-| DEBUG | Troubleshooting context during a fire | Per-request latency/size, retry internals, state sync parameters, resource cleanup |
-| TRACE | Micro-event tracing | Packet encode/decode, per-row dispatch, heartbeat packets, iterator step |
+| ERROR | Needs a human; cannot continue | Init failure, persistent disconnect, retry exhaustion, data corruption |
+| WARN | Degraded but alive; scanned not paged | First I/O timeout (retries), breaker trip, missing non-critical config, rate limit |
+| INFO | Low-frequency milestone (lifecycle, not per-request) | Listening, batch start/end, pool initialized, hot-reload |
+| DEBUG | Troubleshooting context | Per-request latency/size, retry internals, state-sync params |
+| TRACE | Micro-events | Packet encode/decode, per-row dispatch, heartbeat, iterator step |
 
 ## Common Mistakes
 
 | Anti-Pattern | Fix |
 |---|---|
-| `info!` on every DB write success / HTTP 200 | Demote to DEBUG — success is the default, not a milestone |
-| `warn!` on every retry attempt in a loop | WARN on first failure only, DEBUG for subsequent retries, ERROR on exhaustion |
-| `warn!` on expected stream end, channel close, context cancellation | Demote to DEBUG — these are normal lifecycle, not anomalies |
-| `error!` on a retried failure that succeeds | WARN — the system recovered; ERROR reserves it for needing a human |
-| `info!("request received")` on every request | Use a `tracing` span, not a log — fields carry the IDs, not the level |
+| `info!` on every DB write / HTTP 200 | DEBUG — success is default, not a milestone |
+| `warn!` on every retry in a loop | WARN first only, DEBUG retries, ERROR exhaustion |
+| `warn!` on expected stream end / channel close / ctx cancel | DEBUG — normal lifecycle, not anomaly |
+| `error!` on a retried failure that succeeds | WARN — recovered; ERROR is for needing a human |
+| `info!("request received")` per request | `tracing` span — fields carry IDs, not the level |
 
 ## Workflow
-1. List every log statement in scope; classify each by the Decision Tree (frequency → fatal → self-healing → state → else)
-2. Verify each ERROR genuinely needs a human; downgrade recovered failures to WARN
-3. Verify each WARN is either a first-failure or a real degradation — convert routine retries to DEBUG
-4. Verify each INFO is low-frequency lifecycle, not per-request/per-row — demote the rest
-5. Spot-check for level-inverted pairs: a retried failure logged ERROR that succeeds → WARN; a final exhaustion logged WARN → ERROR
-6. Output each log with old level → new level and the one-line reason from the Decision Tree
-
+1. Classify each log by the Decision Tree (frequency → fatal → self-healing → state → else)
+2. ERROR genuinely needs a human? Downgrade recovered failures to WARN
+3. WARN is first-failure or real degradation? Routine retries → DEBUG
+4. INFO is low-frequency lifecycle, not per-request/per-row? Demote the rest
+5. Level-inverted pairs: retried failure logged ERROR that succeeds → WARN; exhaustion logged WARN → ERROR
+6. Output old level → new level + one-line Decision Tree reason

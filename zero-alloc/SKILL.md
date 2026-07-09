@@ -6,51 +6,51 @@ description: Use when reviewing memory allocation in Rust hot paths — heap all
 # Zero-Alloc Performance Reviewer
 
 ## Overview
-The fastest allocation is no allocation. In hot paths and tight loops, eliminate unnecessary heap allocations — keep data on the stack, borrow instead of clone, reuse buffers, and use lazy iterators. Rust makes allocations visible: every `Vec`, `String`, `Box`, and `to_string()` is a heap trip. The goal is to keep hot-path data on the stack and borrow what you don't own.
+The fastest allocation is no allocation. In hot paths, eliminate heap allocs — keep data on the stack, borrow instead of clone, reuse buffers, use lazy iterators. Rust makes every `Vec`/`String`/`Box`/`to_string()` a visible heap trip. Goal: stack-keep hot-path data, borrow what you don't own.
 
 ## When to Use
-- High-frequency functions allocating temporary `Vec`/`String`/`Box` on every call
-- Loops with `format!`/`to_string()`/`to_owned()` or `push_str` building strings
-- `.collect()` into a `Vec` that the caller only iterates once
-- Small structs passed by `Box`/`&` when they'd fit in a register
-- Latency-sensitive paths where allocator pressure shows up in flamegraphs
+- High-frequency functions allocating `Vec`/`String`/`Box` per call
+- Loops building strings via `format!`/`to_string()`/`to_owned()`/`push_str`
+- `.collect()` into a `Vec` iterated only once
+- Small structs boxed or `&`-passed when they'd fit a register
+- Latency-sensitive paths with allocator pressure in flamegraphs
 
 ## Optimization Rules
 
-1. **Borrow, Don't Own** — Take `&str` over `String`, `&[T]` over `Vec<T>` in function signatures. Return `&str`/`&[T]` views into owned data instead of cloning. A signature that asks for ownership it never needs forces every caller to allocate.
+1. **Borrow, Don't Own** — `&str` over `String`, `&[T]` over `Vec<T>` in signatures. Return `&str`/`&[T]` views instead of cloning. A signature demanding ownership it never needs forces every caller to allocate.
 
-2. **Reserve Capacity Up Front** — When the size is known or estimable, `Vec::with_capacity(n)` / `String::with_capacity(n)` before the loop. Without it, every `push`/`push_str` risks a realloc + copy. `Itertools::collect_vec` doesn't know the size hint's upper bound is real; `with_capacity` does.
+2. **Reserve Capacity Up Front** — Known/estimable size: `Vec::with_capacity(n)` / `String::with_capacity(n)` before the loop. Without it, every `push`/`push_str` risks realloc + copy.
 
-3. **Lazy Iterators Over `collect`** — If the caller only iterates once, return an iterator (`impl Iterator<Item = T>`) instead of a `Vec`. O(1) memory instead of O(N). Only `.collect()` when you need random access, multiple passes, or ownership hand-off.
+3. **Lazy Iterators Over `collect`** — Caller iterates once → return `impl Iterator<Item = T>` instead of `Vec`. O(1) vs O(N) memory. Collect only for random access, multiple passes, or ownership hand-off.
 
-4. **Stack-Backed Replacements** — Fixed-size, small: `SmallVec<[T; N]>` / `ArrayVec<T, N>` allocate on the stack until they spill. Fixed-size, known: `[T; N]` is a stack array, zero allocations ever. `Cow<[T]>` / `Cow<str>` returns a borrowed view when possible, allocates only on mutation.
+4. **Stack-Backed Replacements** — Fixed, small: `SmallVec<[T; N]>` / `ArrayVec<T, N>` (stack until spill). Fixed, known: `[T; N]` (zero allocs ever). `Cow<[T]>` / `Cow<str>` borrows when possible, allocs on mutation.
 
-5. **Buffer Reuse** — For repeated work into the same scratch space, take a `&mut Vec<T>` / `&mut String` parameter (or wrap a reusable buffer in your struct) and `.clear()` between iterations instead of allocating fresh each call. The allocator never sees it.
+5. **Buffer Reuse** — Repeated work into the same scratch space: take `&mut Vec<T>` / `&mut String` (or wrap a buffer in your struct), `.clear()` between iterations. The allocator never sees it.
 
 6. **Avoid Hidden Allocations**
-   - `format!` allocates a `String` every call — in a hot loop, write into a reusable `String` with `write!(buf, ...)`.
-   - `.collect()` then `.iter()` again allocates a `Vec` just to re-iterate — chain iterators instead.
-   - `Box::new(SmallStruct{})` "to avoid a copy" forces a heap alloc; pass small structs by value.
-   - Iterator chains with `.cloned()` / `.copied()` / `.map(|x| x.to_string())` allocate per element — prefer `.copied()` over `.cloned()` for `Copy` types (no per-element clone), and borrow over `to_string`.
-   - Closure capture can force a `Vec`/`String` to move (allocate) when a `&` would do.
+   - `format!` allocs a `String` each call — in hot loops, `write!(buf, ...)` into a reusable `String`.
+   - `.collect()` then `.iter()` again allocs just to re-iterate — chain instead.
+   - `Box::new(SmallStruct{})` "to avoid a copy" forces a heap alloc — pass small structs by value.
+   - `.cloned()` allocs per element on `Copy` types — use `.copied()` (no clone); borrow over `to_string`.
+   - Closure capture can move (alloc) a `Vec`/`String` when `&` would do.
 
 ## Common Mistakes
 
 | Anti-Pattern | Fix |
 |---|---|
-| `fn find(ids: Vec<u64>, x: u64)` | `fn find(ids: &[u64], x: u64)` — caller keeps owning, you borrow |
-| `let mut v = Vec::new(); for ... { v.push(x) }` with known size | `let mut v = Vec::with_capacity(n)` — no reallocs |
-| `fn ids() -> Vec<u64>` built once, caller does `for x in ids() { ... }` | Return `impl Iterator<Item=u64>` — zero allocation if caller only iterates |
-| `s += &format!("{}", x)` inside a loop | `write!(s, "{}", x)` into a reusable `String`; reuse across iterations |
-| `Box::new(Point{x, y})` for a 16-byte struct | Pass `Point` by value — it's `Copy`, fits in registers |
-| `Vec<T>` that's almost always 0–8 elements | `SmallVec<[T; 8]>` — stack until spill, no allocator pressure in the common case |
-| `.cloned()` over a `&[u32]` | `.copied()` — `Copy` types, no clone overhead |
-| Fresh `String` built per request in a handler | Take `&mut String` scratch buffer on the struct, `.clear()` per request |
+| `fn find(ids: Vec<u64>, x: u64)` | `fn find(ids: &[u64], x: u64)` — borrow |
+| `Vec::new()` then `push` in loop, known size | `Vec::with_capacity(n)` — no reallocs |
+| `fn ids() -> Vec<u64>`, caller iterates once | Return `impl Iterator<Item=u64>` — zero alloc |
+| `s += &format!("{}", x)` in a loop | `write!(s, "{}", x)` into reusable `String` |
+| `Box::new(Point{x, y})` for 16 bytes | Pass `Point` by value — `Copy`, fits registers |
+| `Vec<T>` almost always 0–8 elements | `SmallVec<[T; 8]>` — stack until spill |
+| `.cloned()` on `&[u32]` | `.copied()` — no clone overhead |
+| Fresh `String` per request in a handler | `&mut String` scratch on the struct, `.clear()` per request |
 
 ## Workflow
-1. Identify the hot path (profiled or known by design — request handler, parser inner loop, packet encode/decode)
-2. List every allocation site: `Vec::new`, `String::from`/`to_string`/`format!`, `Box::new`, `.collect()`, `.clone()` on owned data
-3. For each, ask: can it borrow instead of own? Can it reserve capacity? Can it return an iterator? Can it live on the stack (`SmallVec`/array)?
-4. For per-call scratch, hoist the buffer to the caller or a long-lived struct and `.clear()` between calls
-5. Output the diff with, for each change: old allocation site → new approach, and whether it removes the allocation entirely or only reduces reallocs
-6. Flag any change that trades safety/clarity for allocation — e.g. raw buffer reuse must not leak state across calls; document the invariant
+1. Identify the hot path (profiled or known: handler, parser loop, packet encode/decode)
+2. List every alloc site: `Vec::new`, `to_string`/`format!`, `Box::new`, `.collect()`, `.clone()` on owned data
+3. For each: borrow? reserve capacity? return iterator? stack (`SmallVec`/array)?
+4. Per-call scratch → hoist to caller/struct, `.clear()` between calls
+5. Output per change: alloc site → approach, removes entirely or reduces reallocs
+6. Flag safety/clarity trades — buffer reuse must not leak state across calls; document it
