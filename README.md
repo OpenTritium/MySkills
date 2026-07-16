@@ -69,6 +69,7 @@ To refresh a dedicated project `.agents/skills` directory, remove its contents a
 - `log-level` — tracing levels and OpenTelemetry semantics
 - `naming-smell` — variable, function, and type naming
 - `resource-lifecycle` — ownership, cleanup, pools, transactions, and shutdown
+- `rust-structure-refactor` — function, struct, and module-boundary refactoring
 - `rust-ecosystem` — Cargo, crate integration, features, compatibility, and dependency risk
 - `testing-strategy` — behavioral, deterministic, async, property, and integration tests
 - `unsafe-checker` — unsafe Rust and FFI soundness

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rust Structure Refactor"
+  short_description: "Guide Rust refactors by structure, scope, and boundaries"
+  default_prompt: "Use $rust-structure-refactor to review this Rust refactor for function, struct, and module boundaries."
