@@ -1,30 +1,24 @@
 ---
 name: high-snr-log
-description: Use when reviewing or writing log statements — eliminating noise logs, breadcrumb spam, empty cheerleading, code-translating logs, fat object dumping. Keywords: log, logger, logging, print, info, warn, error, debug, trace, tracing, log::, env_logger, structured logging, SNR, signal-to-noise, log payload, log message, 日志
+description: 'Review Rust log statements and structured `tracing` records for noise, breadcrumb spam, empty success messages, code-translating text, fat payloads, and missing context. Keywords: log, logger, logging, print, info, warn, error, debug, trace, tracing, log::, env_logger, structured logging, SNR, signal-to-noise, log payload, log message, 日志'
 ---
 
 # High-SNR Log Reviewer
 
 ## Overview
-Logs cost disk, ingest, retention, and operator scan time — every line must earn its keep. A log must carry runtime info the code can't know statically (dynamic IDs, latencies, external states, decision outcomes). If you can predict the message from source, it's noise. Routine success is not a log.
-
-## When to Use
-- PRs adding/modifying log statements
-- Refactoring log content/payload quality
-- Auditing production log volume (high cost, low signal)
-- Migrating to structured logging (`tracing` spans/fields)
+Logs cost disk, ingest, retention, and operator scan time — each line should answer an operational question. Prefer runtime context that distinguishes an entity, state, latency, or outcome; static lifecycle messages can still be useful. Routine success usually stays silent.
 
 ## Rules Engine
 
-1. **Anti-Echo** — Delete logs restating the method name or control flow. `fn save() { info!("saving..."); }` is zero value — the span says "save". Normal paths stay silent; log failure, anomaly, or decision points only.
+1. **Anti-Echo** — Delete logs restating the method name or control flow. `fn save() { info!("saving..."); }` adds little beyond the span. Keep normal paths quiet unless the milestone is operationally useful; log failures, anomalies, or decisions.
 
 2. **Context-Driven** — Every log carries dynamic values an operator needs: entity IDs, trace IDs, state transitions, counts, latencies. `info!(user_id, "login")` has signal; `info!("login success")` has none. Can't name the question it answers → delete.
 
-3. **Structured, Not Prose** — Kill freeform `format!` messages. Use indexable fields: `warn!(order_id, attempt, reason = %e, "payment retry failed")`. Grepping `order_id=88 AND level>=warn` works; grepping a sentence doesn't.
+3. **Structured First** — Prefer indexable fields over interpolated `format!` text: `warn!(order_id, attempt, reason = %e, "payment retry failed")`. Keep a concise human-readable message when it helps operators.
 
 4. **No Dual Printing** — Never log AND propagate an error (`error!(?e); return Err(e)`); the outer boundary logs once. (Full rule: `error-silence`.)
 
-5. **Fat-Object Discipline** — Never dump whole structs/bodies/JSON at INFO/WARN — bloats ingest, leaks PII, buries the one field that matters. Log 1–3 identifying fields; demote full dumps to `trace!` behind a flag, or drop.
+5. **Fat-Object Discipline** — Avoid whole structs/bodies/JSON by default at any level: they bloat ingest and may leak secrets or PII. Emit bounded, redacted fields; TRACE is not a privacy boundary.
 
 6. **Span, Not Breadcrumb** — "entering/leaving function X" → `#[tracing::instrument]` span or `info_span!`, not manual `debug!("enter X")`. Spans give timing, nesting, correlation; breadcrumbs give noise.
 
@@ -45,10 +39,10 @@ Logs cost disk, ingest, retention, and operator scan time — every line must ea
 | `debug!("entering A")` / `debug!("leaving A")` | `#[tracing::instrument]` span — timing + correlation free |
 | `info!("save to DB success!")` | Delete — log failure/anomaly only |
 | `info!("processing request")` at handler top | `#[tracing::instrument(skip(req))]` — fields carry IDs |
-| `info!("request: {:?}", request)` | Log identifying fields only: `info!(request_id, user_id, path = %req.path)` |
+| `info!("request: {:?}", request)` | Log bounded identifying fields only: `info!(request_id, user_id, path = %req.path)` |
 | `error!(?e, "failed"); return Err(e)` | Delete the log; boundary logs once |
 | `info!("done")` cheerleading | Delete — unless slow batch completion, then add duration |
-| `println!("{:?}", body)` debug leftover | Delete or demote to `trace!` behind a flag |
+| `println!("{:?}", body)` debug leftover | Delete or emit bounded, redacted fields under an explicit diagnostic filter |
 
 ## Workflow
 1. Enumerate every log; each must justify its existence

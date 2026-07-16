@@ -1,19 +1,12 @@
 ---
 name: naming-smell
-description: Use when reviewing variable/function/type names in code — detecting generic names, misleading names, noise words, abbreviations, single-letter variables, boolean blindness. Keywords: naming, variable name, function name, type name, rename, code smell, readability, data, tmp, info, result, handler, manager, 命名, 变量命名, 可读性
+description: 'Review Rust variable, function, and type names for generic or misleading names, noise words, harmful abbreviations, single-letter names, and boolean blindness. Keywords: naming, variable name, function name, type name, rename, code smell, readability, data, tmp, info, result, handler, manager, 命名, 变量命名, 可读性'
 ---
 
 # Naming Smell Reviewer
 
 ## Overview
 Names are the most-read documentation. A good name is a micro-spec — answers "what is this?" without the implementation. A bad name lies, hides, or says nothing. Treat naming as a correctness concern.
-
-## When to Use
-- New variable/function/type names in PRs
-- `data`, `tmp`, `info`, `result`, `val`, `item` in production code
-- Functions named `process()`, `handle()`, `run()`, `do_it()`
-- `bool` params/returns without context
-- Readability debt audit
 
 ## Rules Engine
 
@@ -23,11 +16,11 @@ Names are the most-read documentation. A good name is a micro-spec — answers "
 
 3. **Kill Noise Words** — Strip `Data`, `Info`, `Object`, `Thing`, `Item`. Rust's type already carries `Vec`/`HashMap`/`String` — don't duplicate (`user_list: Vec<User>` → `users`).
 
-4. **Verbs for Functions, Nouns for Values** — `get_user()` not `user()`. `is_expired()` for predicates. Functions DO; values ARE.
+4. **Verbs for Functions, Nouns for Values** — Use names that reveal the operation and result: `fetch_user()`, `parse_config()`, `is_expired()`. Follow domain conventions when a noun-like function name is already unambiguous.
 
 5. **Abbreviation Gate** — Keep only universal: `url`, `http`, `sql`, `json`, `db`, `ctx`. Kill `usr`, `pwd`, `msg`, `cnt`, `idx`, `mgr`. Follow existing codebase convention.
 
-6. **No Boolean Blindness** — Bare `bool` says nothing about what `true` means. `set_enabled(device, true)` — on? enabled? active? Fixes, by preference:
+6. **Reduce Boolean Blindness** — Bare `bool` can hide what `true` means. `set_enabled(device, true)` — on? enabled? active? Prefer, when useful:
    - **Two functions**: `enable(device)` / `disable(device)` — reads itself.
    - **Named enum**: `set_mode(device, Mode::Enabled)` — self-documenting.
    - **Interrogative name**: `set(device, is_enabled)` — acceptable, weaker than enum.
@@ -50,7 +43,7 @@ Names are the most-read documentation. A good name is a micro-spec — answers "
 |---|---|
 | `data` / `info` / `result` / `tmp` / `val` | Name the data: `parsed_orders`, `config_overrides`, `matched_count` |
 | `user_list: Vec<User>` | `users` — drop the type suffix |
-| `validate()` returning bool | `is_valid()`, or return `Result` |
+| `validate()` returning bool | Use `is_valid()` for a predicate, or return `Result` when validation needs an explanation |
 | `process(s: String, b: bool)` | `process(order_id, mode: Mode)` (`func-smell`) |
 | `DataManager`, `InfoProcessor`, `BaseHandler` | Drop noise: `OrderStore`, `ConfigParser`, `RateLimiter` |
 | `get_user()` with side effects | `get_` implies pure/cheap → `fetch_`/`load_` (`func-smell` Rule 5) |

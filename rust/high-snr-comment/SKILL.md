@@ -1,19 +1,12 @@
 ---
 name: high-snr-comment
-description: Use when reviewing or writing code comments — eliminating redundant comments, code-translating comments, outdated comments, commented-out code, empty cheerleading. Keywords: comment, annotation, doc, Javadoc, godoc, docstring, ///, //, /*, TODO, FIXME, SNR, signal-to-noise, code review, 注释, 代码审查
+description: 'Review or write Rust code comments and documentation: remove redundant or code-translating comments, stale notes, commented-out code, and empty cheerleading while preserving rationale, contracts, and edge cases. Keywords: comment, annotation, doc, Javadoc, godoc, docstring, ///, //, /*, TODO, FIXME, SNR, signal-to-noise, code review, 注释, 代码审查'
 ---
 
 # High-SNR Comment Reviewer
 
 ## Overview
 Code is the best comment — comments must NOT translate code. They explain WHY (intent, tradeoffs, edge cases, design), never WHAT. Test: "Would I delete this in 6 months?" — if it can't stand without the code, it's noise.
-
-## When to Use
-- PRs adding or changing comments
-- Legacy comments contradicting code
-- Commented-out code blocks
-- `///` doc vs `//` inline discipline
-- Team comment conventions
 
 ## Rules Engine
 
@@ -23,7 +16,7 @@ Code is the best comment — comments must NOT translate code. They explain WHY 
 
 3. **No Archeology** — Delete commented-out code; git history preserves it. (`#[cfg(test)]` modules are not commented-out code — they compile and run.)
 
-4. **Drift Detection** — A comment >2 PRs old is suspect. Outdated comments are worse than none. When modifying code, update or delete adjacent comments.
+4. **Drift Detection** — Compare comments with the code whenever either changes; age alone is not evidence. Outdated comments are worse than none.
 
 5. **Doc vs Inline** — Two channels, different jobs:
    - `///` on **public items** (`pub fn`/`struct`/`trait`) = the *contract*. Standard sections: `# Arguments`, `# Returns`, `# Errors`, `# Panics`. Renders in `cargo doc`.
