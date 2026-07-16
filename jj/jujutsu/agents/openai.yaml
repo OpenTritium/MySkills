@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jujutsu"
+  short_description: "Safe agent workflows for Jujutsu VCS"
+  default_prompt: "Use $jujutsu for safe, non-interactive Jujutsu version-control operations."

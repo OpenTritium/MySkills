@@ -1,0 +1,4 @@
+interface:
+  display_name: "Architecture Entropy Review"
+  short_description: "Find architectural drift after large refactors"
+  default_prompt: "Use $architecture-entropy-review to review this refactor for duplication, domain drift, abstraction bypasses, and architectural entropy."

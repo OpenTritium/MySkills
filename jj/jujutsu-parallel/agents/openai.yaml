@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jujutsu Parallel Agents"
+  short_description: "Parallel agent workspaces without stale conflicts"
+  default_prompt: "Use $jujutsu-parallel to coordinate multiple agents working in isolated Jujutsu workspaces."

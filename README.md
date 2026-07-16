@@ -1,6 +1,6 @@
 # MySkills
 
-Rust-focused Codex skills for code review, correctness, observability, naming, and performance.
+Codex skills for Rust development, code review, and safe version-control workflows.
 
 ## Install with Bun
 
@@ -59,6 +59,7 @@ To refresh a dedicated project `.agents/skills` directory, remove its contents a
 
 ## Skills
 
+- `architecture-entropy-review` — architectural drift after large refactors
 - `big-o-optimizer` — algorithm complexity and data structures
 - `async-concurrency` — async tasks, synchronization, cancellation, and backpressure
 - `encode-invariant` — type-level immutability and domain invariants
@@ -66,6 +67,8 @@ To refresh a dedicated project `.agents/skills` directory, remove its contents a
 - `func-smell` — function and method design
 - `high-snr-comment` — comments and documentation signal quality
 - `high-snr-log` — structured log content and noise
+- `jujutsu` — safe agent workflows for Jujutsu version control
+- `jujutsu-parallel` — parallel Jujutsu workspaces for multiple agents
 - `log-level` — tracing levels and OpenTelemetry semantics
 - `naming-smell` — variable, function, and type naming
 - `resource-lifecycle` — ownership, cleanup, pools, transactions, and shutdown
