@@ -40,6 +40,21 @@ Verify the project installation:
 bunx skills list --agent codex
 ```
 
+Refresh the shared global `$HOME/.agents/skills` directory:
+
+```bash
+rm -rf "$HOME/.agents/skills"/*
+bunx skills add OpenTritium/MySkills \
+  --global \
+  --agent cline \
+  --skill '*' \
+  --full-depth \
+  --copy \
+  --yes
+```
+
+The `cline` target is used here because this CLI agent maps its global skills directory to `$HOME/.agents/skills`.
+
 To refresh a dedicated project `.agents/skills` directory, remove its contents and run the install command again. Do not remove a shared directory that contains skills from other repositories.
 
 ## Skills
