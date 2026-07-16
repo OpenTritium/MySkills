@@ -60,6 +60,7 @@ To refresh a dedicated project `.agents/skills` directory, remove its contents a
 ## Skills
 
 - `big-o-optimizer` — algorithm complexity and data structures
+- `async-concurrency` — async tasks, synchronization, cancellation, and backpressure
 - `encode-invariant` — type-level immutability and domain invariants
 - `error-silence` — Rust error propagation and panic boundaries
 - `func-smell` — function and method design
@@ -67,4 +68,8 @@ To refresh a dedicated project `.agents/skills` directory, remove its contents a
 - `high-snr-log` — structured log content and noise
 - `log-level` — tracing levels and OpenTelemetry semantics
 - `naming-smell` — variable, function, and type naming
+- `resource-lifecycle` — ownership, cleanup, pools, transactions, and shutdown
+- `rust-ecosystem` — Cargo, crate integration, features, compatibility, and dependency risk
+- `testing-strategy` — behavioral, deterministic, async, property, and integration tests
+- `unsafe-checker` — unsafe Rust and FFI soundness
 - `zero-alloc` — avoidable allocations in Rust hot paths
