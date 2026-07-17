@@ -32,6 +32,7 @@ Use this matrix to keep skill ownership explicit. Each query should have one pri
 | Resource cleanup, `Drop`, locks, or transaction scope | `resource-lifecycle` |
 | Encode a non-empty or immutable value in its type | `encode-invariant` |
 | Handle `Result`, `unwrap`, or ignored errors | `error-silence` |
+| Design Snafu errors, selectors, `Whatever`, or `context` | `rust-snafu` | `error-silence` for swallowing/logging; `rust-ecosystem` for dependency/features |
 | Unsafe code, FFI, raw pointers, or `SAFETY` | `unsafe-checker` |
 | Cargo features, crate compatibility, or MSRV | `rust-ecosystem` |
 | Behavioral, deterministic, or integration test design | `testing-strategy` |

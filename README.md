@@ -67,6 +67,7 @@ Skills remain under stable source roots, but the index groups them by the questi
 - `encode-invariant` — type-level immutability and domain invariants
 - `error-silence` — Rust error propagation and panic boundaries
 - `resource-lifecycle` — ownership, cleanup, pools, transactions, and shutdown
+- `rust-snafu` — Snafu error types, context propagation, sources, and reporting
 - `rust-state-machine` — explicit Rust states, legal transitions, and invalid-state prevention
 - `unsafe-checker` — unsafe Rust and FFI soundness
 

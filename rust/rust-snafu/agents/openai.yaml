@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rust Snafu"
+  short_description: "Design Snafu error types well"
+  default_prompt: "Use $rust-snafu to design or review Snafu error types, context propagation, and error reporting."
