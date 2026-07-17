@@ -26,9 +26,12 @@ Use this matrix to keep skill ownership explicit. Each query should have one pri
 
 ## Language And Runtime
 
-| Query | Primary skill |
-|---|---|
+| Query | Primary skill | Secondary boundary |
+|---|---|---|
 | `Send`, cancellation, channel, or deadlock design | `async-concurrency` |
+| Choose std versus async locks, atomics, channels, semaphores, or notifications | `async-concurrency` | `concurrency-testing` for behavioral coverage; `resource-lifecycle` for ownership and cleanup |
+| Choose MPSC versus MPMC or sync versus async channels | `async-concurrency` | `concurrency-testing` for ordering/backpressure coverage; `rust-ecosystem` for crate integration |
+| Choose a domain-specific concurrency crate instead of std/Tokio primitives | `async-concurrency` | `rust-ecosystem` for dependency compatibility and supply-chain review |
 | Resource cleanup, `Drop`, locks, or transaction scope | `resource-lifecycle` |
 | Encode a non-empty or immutable value in its type | `encode-invariant` |
 | Handle `Result`, `unwrap`, or ignored errors | `error-silence` |
@@ -36,6 +39,8 @@ Use this matrix to keep skill ownership explicit. Each query should have one pri
 | Unsafe code, FFI, raw pointers, or `SAFETY` | `unsafe-checker` |
 | Cargo features, crate compatibility, or MSRV | `rust-ecosystem` |
 | Behavioral, deterministic, or integration test design | `testing-strategy` |
+| Force and verify TOCTOU, double-consumption, order-dependent, or race interleavings in tests | `concurrency-testing` | `testing-strategy` for general test design; `async-concurrency` for production concurrency design |
+| Test cancellation/retry recovery, lost wakeups, ABA/version, or queue capacity/closure races | `concurrency-testing` | `async-concurrency` for the production lifecycle or synchronization design |
 
 ## Maintenance Rules
 

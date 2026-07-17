@@ -81,6 +81,7 @@ Skills remain under stable source roots, but the index groups them by the questi
 ### Review And Clarity
 
 - `big-o-optimizer` — algorithm complexity and data structures
+- `concurrency-testing` — deterministic interleaving tests for concurrent behavior
 - `func-smell` — function and method design
 - `high-snr-comment` — comments and documentation signal quality
 - `high-snr-log` — structured log content and noise

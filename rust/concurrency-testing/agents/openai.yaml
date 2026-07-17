@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rust Concurrency Testing"
+  short_description: "Design deterministic tests for concurrent races"
+  default_prompt: "Use $concurrency-testing to design deterministic Rust tests for interleavings, linearizability, failure recovery, and race conditions."
