@@ -35,9 +35,11 @@ Use this matrix to keep skill ownership explicit. Each query should have one pri
 | Choose a domain-specific concurrency crate instead of std/Tokio primitives | `async-concurrency` | `rust-ecosystem` for dependency compatibility and supply-chain review |
 | Resource cleanup, `Drop`, locks, or transaction scope | `resource-lifecycle` |
 | Encode a non-empty or immutable value in its type | `encode-invariant` |
+| Choose boxed storage or alias versus newtype under serde, builder, arithmetic, or serialization integration constraints | `encode-invariant` | `rust-ecosystem` for dependency/build compatibility; `zero-alloc` for measured hot-path allocation cost |
 | Handle `Result`, `unwrap`, or ignored errors | `error-silence` |
 | Design Snafu errors, selectors, `Whatever`, or `context` | `rust-snafu` | `error-silence` for swallowing/logging; `rust-ecosystem` for dependency/features |
-| Unsafe code, FFI, raw pointers, or `SAFETY` | `unsafe-checker` |
+| Unsafe code, FFI, raw pointers, `unsafe impl Send/Sync`, or `SAFETY` | `unsafe-checker` |
+| Test-only `set_var`/`remove_var` or audit a low-unsafe Rust codebase for hidden FFI and manual thread-safety assumptions | `unsafe-checker` | `testing-strategy` for general isolation; `concurrency-testing` when a deterministic interleaving is required |
 | Cargo features, crate compatibility, or MSRV | `rust-ecosystem` |
 | Behavioral, deterministic, or integration test design | `testing-strategy` |
 | Force and verify TOCTOU, double-consumption, order-dependent, or race interleavings in tests | `concurrency-testing` | `testing-strategy` for general test design; `async-concurrency` for production concurrency design |

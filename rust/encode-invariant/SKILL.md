@@ -1,28 +1,29 @@
 ---
 name: encode-invariant
-description: 'Use when reviewing Rust types for post-construction immutability or domain invariants. Prefer boxed slices/strings, shared unsized forms, NonZero types, newtypes, and enums that make invalid states unrepresentable. Keywords: boxed slice, into_boxed_slice, boxed str, into_boxed_str, invariant, immutable, Vec to boxed slice, String to boxed str, newtype, NonZero, type state, CompactString, smallvec, niche optimization, 类型不变, 盒装切片, 新类型'
+description: 'Use when reviewing Rust types for post-construction immutability or domain invariants, including the integration cost of boxed types and alias-versus-newtype choices. Prefer boxed slices/strings, shared unsized forms, NonZero types, newtypes, and enums that make invalid states unrepresentable. Keywords: boxed slice, into_boxed_slice, boxed str, into_boxed_str, invariant, immutable, Vec-to-boxed-slice, String-to-boxed-str, serde Deserialize, builder macro, type alias, newtype, NonZero, type state, CompactString, smallvec, niche optimization, 类型不变, 盒装切片, 新类型'
 ---
 
 # Encode Invariant
 
-## Overview
-Rust turns immutability and domain constraints into compile-time facts. If data won't change after construction, the type should say so. Every `Vec<T>` that never grows is a leaked capability — a maintainer can `.push()` because the type allows it. Shrink the type, not the runtime check.
+## Core Question
+
+Does the representation make the invariant explicit without imposing disproportionate construction, API, or interoperability cost?
 
 ## Rules Engine
 
-1. **Freeze with Box** — `Vec<T>` → `Box<[T]>`, `String` → `Box<str>` when built once then read-only. `.into_boxed_slice()` / `.into_boxed_str()` at the finish. This removes mutation and may reduce metadata on common 64-bit layouts; verify ownership and layout tradeoffs.
+1. **Freeze with Box** — `Vec<T>` → `Box<[T]>`, `String` → `Box<str>` when built once then read-only. `.into_boxed_slice()` / `.into_boxed_str()` at the finish. This removes resize operations and may reduce metadata on common 64-bit layouts; verify ownership and layout tradeoffs.
+
+   **Integration friction matters.** Check `Deserialize` and builder paths before converting: deserialization into an owned string followed by boxing may add allocation and conversion work. Keep the original type when that friction outweighs the guarantee; otherwise centralize conversion at one boundary.
+
+   **Container versus contents.** `Box<[T]>` freezes length, not `T`; mutable slice or element access remains possible. `Arc<[T]>` adds shared ownership and normally limits access to shared borrows; it is not deep immutability.
 
 2. **Share without Fat** — `Arc<Vec<T>>` = 3 layers (Arc → Vec → heap); `Arc<[T]>` = 2. Same for `Rc<String>` → `Rc<str>`. Convert at construction: `Arc::from(vec.into_boxed_slice())`.
 
-3. **Newtype the Meaning, Not the Mechanics** — `struct UserId(u64)` prevents `send(userID, orderID)` arg swaps; zero-cost. **But only newtype when you need domain behavior** — methods, validation, distinct signature identity, or arg-swap protection. For pure readability with no methods, `type UserId = u64;` is simpler (no protection). Newtype buys enforcement; alias buys ergonomics.
+3. **Choose alias versus newtype deliberately** — Use a newtype for boundary types, validation, domain-specific methods, or argument-swap protection. Prefer a type alias when the type is documentation-only and arithmetic operators, comparisons across many sites, or serialization interop with external libraries are central. An alias buys ergonomics but provides no type protection; a newtype buys enforcement at the cost of conversions and trait forwarding.
 
-4. **Prove Constraints at the Boundary** — "Amount > 0" → `NonZeroU64` or `struct PositiveAmount(u64)` with validating constructor. "Name non-empty" → `struct NonEmptyString(String)`. Validate once at construction; consumers are safe by construction.
+4. **Prove Constraints at the Boundary** — Use `NonZero` or a validating newtype for domain constraints. Validate once at construction; consumers are safe by construction.
 
-5. **Enum > (bool + Option)** — If `is_connected` implies `connection.is_some()`, you have impossible states. Replace:
-   ```rust
-   enum Connection { Disconnected, Connected(Socket), Authenticated { token: Token, socket: Socket } }
-   ```
-   Now `send(Disconnected)` won't compile.
+5. **Enum > (bool + Option)** — Replace correlated flags and optional fields with enum states so impossible states cannot compile.
 
 6. **Niche Matters** — `Option<Box<T>>` = same size as `Box<T>` (null is niche). `Option<NonZeroU32>` = same size as `u32` (zero is niche). For optional values with an absent sentinel, `Option` is free.
 
@@ -34,30 +35,28 @@ Rust turns immutability and domain constraints into compile-time facts. If data 
 | `String` (read-only after build) | `Box<str>` / `Arc<str>` | Removes capacity mutation; may reduce metadata |
 | `Arc<Vec<T>>` | `Arc<[T]>` | Fewer layers; layout benefit is platform-dependent |
 | `Rc<String>` | `Rc<str>` / `Arc<str>` | Fewer layers; layout benefit is platform-dependent |
-| `u64` args (swappable, needs methods) | `OrderId(u64)`, `UserId(u64)` newtypes | arg-swap prevention + method home |
-| `u64` (readability only, no methods) | `type UserId = u64;` alias | ergonomic; no type protection |
-| `amount: u64 // must be > 0` | `NonZeroU64` / `PositiveAmount(u64)` | compile-time guarantee |
+| Boundary values with swap or validation risk | Newtype | distinct signatures and invariant enforcement |
+| `u64` (documentation only, arithmetic-heavy) | Type alias of `u64` | operator and serialization interop; no type protection |
+| Values with a non-zero or domain constraint | `NonZero` / validating newtype | compile-time guarantee after construction |
 | `Option<T>` + `bool` | `enum { Connected(T), Disconnected }` | 1 impossible state eliminated |
-| `PathBuf` (read-only) | `Box<Path>` | No mutation; layout benefit is platform-dependent |
-| `Vec<u8>` (read-only, e.g. hash digest) | `Box<[u8]>` / `[u8; N]` | Encoded immutability; array avoids allocation when size is fixed |
 
 ## Common Mistakes
 
 | Anti-Pattern | Fix |
 |---|---|
-| `let ids: Vec<u64> = load(); // never mutates` | `let ids: Box<[u64]> = load().into_boxed_slice();` |
-| `fn cache(data: Arc<Vec<User>>)` | `fn cache(data: Arc<[User]>)` — `Arc::from(vec.into_boxed_slice())` |
-| `fn delete(user_id: u64, org_id: u64)` | Newtype both — prevents swap bug |
-| `struct UserId(u64)` zero methods, used only in formatting | Downgrade to `type UserId = u64;` — newtype adds friction, no payoff |
-| `struct Config { name: String } // never changed` | `name: Box<str>` — trims capacity field |
-| `if amount <= 0 { return Err }` in 5 places | Validate once in `PositiveAmount::new()` |
-| `fn process(conn: Option<Conn>, ready: bool)` | `enum ConnState { Disconnected, Connecting, Ready(Conn) }` |
-| Comment: `// append-only after init` | Let the type enforce it — comment is not a compiler |
+| Deserializable type with boxed string fields and builder conversions | Measure the serde/builder friction; retain the owned string type or convert once at a boundary if the guarantee does not justify the cost |
+| `Box<[T]>` assumed to make every `T` immutable | State separately whether the container or its elements are frozen; inspect `&mut T` access |
+| Newtype has no boundary behavior, validation, or domain methods | Prefer a type alias when arithmetic and interoperability dominate |
+| Domain validation is repeated at call sites | Validate once and carry the validated type |
+| Correlated flags and optional fields encode states | Replace them with an enum |
 
 ## Workflow
-1. Find `Vec<T>` / `String` / `PathBuf` / `OsString` never mutated after init → boxed type
-2. Find `Arc<Vec<T>>` / `Rc<String>` → flatten to `Arc<[T]>` / `Arc<str>`
-3. Comments describing invariants ("must not be empty", "always positive") → newtype
-4. `(Option<T>, bool)` pairs → single enum
-5. Swappable `u64`/`String` params → newtype
-6. Output diff: old type → new type, bytes saved, bug class prevented
+1. Find mutable representations whose post-construction capabilities are unused.
+2. Check construction, public callers, serialization, builders, and measured hot paths.
+3. Separate container immutability from element/content mutability.
+4. Choose boxed storage, alias, newtype, `NonZero`, or enum based on the invariant and integration cost.
+5. Report the representation change, tradeoff, and prevented bug class.
+
+## Boundary
+
+Use `rust-ecosystem` for dependency, feature, and build portability questions; use `zero-alloc` for measured hot-path allocation optimization. This skill decides whether a type-level invariant or immutability guarantee justifies its representation and integration cost.
