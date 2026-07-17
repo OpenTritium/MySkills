@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rust Guard Clauses"
+  short_description: "Flatten Rust control flow safely"
+  default_prompt: "Use $rust-guard-clauses to review Rust functions for fail-fast guards and clear error flow."

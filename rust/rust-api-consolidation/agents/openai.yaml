@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rust API Consolidation"
+  short_description: "Consolidate Rust APIs safely"
+  default_prompt: "Use $rust-api-consolidation to decide which Rust APIs to merge, remove, or preserve as seams."

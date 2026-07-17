@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rust Import Hygiene"
+  short_description: "Review Rust use imports for clarity"
+  default_prompt: "Use $rust-import-hygiene to review and simplify Rust use imports."

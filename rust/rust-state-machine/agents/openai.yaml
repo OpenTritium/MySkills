@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rust State Machine"
+  short_description: "Review Rust state transitions"
+  default_prompt: "Use $rust-state-machine to review Rust state modeling, transitions, and invalid states."

@@ -1,59 +1,42 @@
 ---
 name: naming-smell
-description: 'Review Rust variable, function, and type names for generic or misleading names, noise words, harmful abbreviations, single-letter names, and boolean blindness. Keywords: naming, variable name, function name, type name, rename, code smell, readability, data, tmp, info, result, handler, manager, 命名, 变量命名, 可读性'
+description: "Review Rust variable, function, and type names for misleading contracts, fallibility, optionality, side effects, ownership, blocking behavior, noise, abbreviations, and boolean blindness. Use when naming or reviewing Rust APIs, variables, functions, types, conversions, state methods, or error-returning operations. 中文触发：命名、变量命名、函数命名、API 命名、try 命名、可失败方法、可读性"
 ---
 
 # Naming Smell Reviewer
 
-## Overview
-Names are the most-read documentation. A good name is a micro-spec — answers "what is this?" without the implementation. A bad name lies, hides, or says nothing. Treat naming as a correctness concern.
+Treat names as API contracts. A name should reveal the operation, result, effects, ownership, cost, and failure behavior that callers must understand.
 
-## Rules Engine
+## Rules
 
-1. **Reveal Intent** — Answer WHAT it IS/DOES, not its type or storage. `user_ids` beats `list`; `total_revenue` beats `sum`.
+1. **Reveal domain intent** — Use specific nouns for values and verbs for operations: `active_users`, `parse_config`, `send_invoice`. Remove storage words (`list`, `data`, `result`) and generic verbs (`process`, `handle`, `do_`) unless context makes them precise.
 
-2. **No False Advertising** — `customers: Vec<_>` named `customer_set` is a lie. `validate_or_throw` that doesn't is a trap. Names are contracts; the compiler enforces types, review enforces names.
+2. **Name failure and absence honestly** — Do not prefix every `Result` method with `try_`. Use `try_` for a meaningful alternate contract such as `lock`/`try_lock`, `send`/`try_send`, or `new`/`try_new`. Use `find_` when ordinary absence returns `Option`; return `Result` when callers need a failure reason.
 
-3. **Kill Noise Words** — Strip `Data`, `Info`, `Object`, `Thing`, `Item`. Rust's type already carries `Vec`/`HashMap`/`String` — don't duplicate (`user_list: Vec<User>` → `users`).
+3. **Expose effects and cost** — Reserve `get_` for cheap lookup or access; use `fetch_`/`load_` for I/O and `refresh_`/`reconcile_` for synchronization or mutation. Use `ensure_` when the method establishes a condition and `assert_` when it intentionally panics. `is_`/`has_`/`can_`/`should_` should be query-like and side-effect free.
 
-4. **Verbs for Functions, Nouns for Values** — Use names that reveal the operation and result: `fetch_user()`, `parse_config()`, `is_expired()`. Follow domain conventions when a noun-like function name is already unambiguous.
+4. **Follow ownership conventions** — Use `as_` for a borrowed view, `to_` for a new value, and `into_` for a consuming conversion. Use `_ref`/`_mut` when borrow mode matters; use `peek`, `take`, `remove`, and `replace` to expose consumption and replacement behavior.
 
-5. **Abbreviation Gate** — Keep only universal: `url`, `http`, `sql`, `json`, `db`, `ctx`. Kill `usr`, `pwd`, `msg`, `cnt`, `idx`, `mgr`. Follow existing codebase convention.
+5. **Make paired APIs symmetric** — Name lifecycle operations consistently (`start`/`stop`, `open`/`close`, `enable`/`disable`). Use `blocking_` or `try_` when blocking and immediate/non-blocking variants coexist; follow the codebase's async convention.
 
-6. **Reduce Boolean Blindness** — Bare `bool` can hide what `true` means. `set_enabled(device, true)` — on? enabled? active? Prefer, when useful:
-   - **Two functions**: `enable(device)` / `disable(device)` — reads itself.
-   - **Named enum**: `set_mode(device, Mode::Enabled)` — self-documenting.
-   - **Interrogative name**: `set(device, is_enabled)` — acceptable, weaker than enum.
-   Same smell as boolean *parameters* (`func-smell` Rule 2); here about name/type, there about design.
+6. **Avoid boolean blindness** — Replace ambiguous flags with paired functions, a named enum, or a predicate-named parameter such as `is_enabled`. Do not name booleans `flag`, `status`, or `value`.
 
-## Signal Names
+7. **Remove false promises and noise** — A name implying purity, cheapness, idempotence, no blocking, or no panic must match the implementation. Drop `Data`, `Info`, `Object`, `Thing`, `Item`, type suffixes, and harmful abbreviations; retain universal abbreviations such as `url`, `http`, `sql`, `json`, `db`, and `ctx` when the codebase agrees.
 
-| Category | Rule | Good | Bad |
-|---|---|---|---|
-| Variable | Noun, specific | `active_users`, `retry_timeout` | `data`, `list`, `tmp` |
-| Function | Verb + noun | `send_invoice()`, `parse_config()` | `process()`, `handle()` |
-| Boolean | Predicate `is_`/`has_`/`can_` | `is_ready`, `has_permission` | `flag`, `status` |
-| Boolean param | Avoid; name meaning if used | `set(device, is_enabled)` | `set(device, val)` |
-| Constant | UPPER_SNAKE, meaningful | `MAX_RETRY_ATTEMPTS` | `THREE`, `VAL_42` |
-| Type | Noun, models a thing | `OrderValidator`, `CachePolicy` | `Helper`, `Utils`, `Common` |
+## Contract Pairs
 
-## Common Mistakes
-
-| Anti-Pattern | Fix |
-|---|---|
-| `data` / `info` / `result` / `tmp` / `val` | Name the data: `parsed_orders`, `config_overrides`, `matched_count` |
-| `user_list: Vec<User>` | `users` — drop the type suffix |
-| `validate()` returning bool | Use `is_valid()` for a predicate, or return `Result` when validation needs an explanation |
-| `process(s: String, b: bool)` | `process(order_id, mode: Mode)` (`func-smell`) |
-| `DataManager`, `InfoProcessor`, `BaseHandler` | Drop noise: `OrderStore`, `ConfigParser`, `RateLimiter` |
-| `get_user()` with side effects | `get_` implies pure/cheap → `fetch_`/`load_` (`func-smell` Rule 5) |
-| `x1`, `x2`, `response1`, `response2` | Name roles: `current_response`, `previous_response` |
-| `fn set(device, flag: bool)` | `enable(device)` / `disable(device)`, or `set_mode(.., Mode::..)` |
-| `usr_repo`, `mgr` | `user_repository`, `manager` |
+| Contract | Prefer | Avoid |
+|---|---|---|
+| Cheap lookup / I/O | `get_user` / `fetch_user` | `get_user` that performs network I/O |
+| Predicate / validation / establishment | `is_valid` / `validate` / `ensure_ready` | `check` with an unclear result or effect |
+| Borrow / create / consume | `as_path` / `to_path_buf` / `into_path_buf` | `convert` or `make` |
+| Non-consuming / move out / delete | `peek` / `take` / `remove` | `read` when it consumes state |
+| Fallible alternate | `parse` / `try_parse` only when contracts differ | `try_parse` as decoration |
 
 ## Workflow
-1. Scan for 1–2 char names and `data`/`tmp`/`info` — each needs a rename
-2. Audit function names: do they promise more/less than the impl delivers?
-3. Boolean names: does `if (flag)` tell you what it guards?
-4. Strip noise suffixes — if the name loses no info, they added none
-5. Output before/after pairs with justification
+
+1. Infer return, absence, mutation, I/O, blocking, ownership, and panic behavior from implementation and call sites.
+2. Compare the name with that contract and with neighboring API pairs.
+3. Rename only when the new name removes ambiguity; preserve established domain terminology.
+4. Check callers, documentation, re-exports, and tests after each rename.
+5. Report the before/after name and the contract mismatch that justified the change.
