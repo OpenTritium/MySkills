@@ -19,7 +19,7 @@ Treat names as API contracts. A name should reveal the operation, result, effect
 
 5. **Make paired APIs symmetric** — Name lifecycle operations consistently (`start`/`stop`, `open`/`close`, `enable`/`disable`). Use `blocking_` or `try_` when blocking and immediate/non-blocking variants coexist; follow the codebase's async convention.
 
-6. **Avoid boolean blindness** — Replace ambiguous flags with paired functions, a named enum, or a predicate-named parameter such as `is_enabled`. Do not name booleans `flag`, `status`, or `value`.
+6. **Avoid boolean blindness** — Improve ambiguous flags with paired functions, a named enum, or a predicate-named parameter such as `is_enabled`. The boolean type alone is not the smell: an expression such as `result.is_ok()` can make the call site self-explanatory, so do not split the API when that would merely duplicate behavior. Do not name booleans `flag`, `status`, or `value`.
 
 7. **Remove false promises and noise** — A name implying purity, cheapness, idempotence, no blocking, or no panic must match the implementation. Drop `Data`, `Info`, `Object`, `Thing`, `Item`, type suffixes, and harmful abbreviations; retain universal abbreviations such as `url`, `http`, `sql`, `json`, `db`, and `ctx` when the codebase agrees.
 

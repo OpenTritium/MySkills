@@ -12,7 +12,7 @@ A function is a contract: given inputs, produce this output or effect. When the 
 
 1. **Parameter Budget** — Treat 4+ parameters as a review trigger, not an automatic defect. Group parameters only when they share a concept or lifecycle; split behavior when the contract is genuinely different.
 
-2. **No Boolean Flags** — `save(order, true)` means nothing at the call site. Split into `save()` / `save_dry_run()`, take a config struct, or use `enum Mode`. Boolean flags signal two functions in a trench coat.
+2. **Review Boolean Flags at the Call Site** — A `bool` is a review trigger, not an automatic defect. Flag `save(order, true)` when the argument is ambiguous or selects materially different contracts. Prefer named operations, a config struct, or `enum Mode` in that case. Keep a boolean when its source communicates the predicate clearly, such as `record(metrics, result.is_ok())`, and splitting it would only duplicate implementation. Do not force two APIs merely because a parameter has type `bool`.
 
 3. **One Level of Abstraction** — Don't mix `open_file()` with `compute_tax()` with `send_email()`. Either orchestrate (high-level steps) or compute (pure logic), not both.
 
@@ -27,7 +27,7 @@ A function is a contract: given inputs, produce this output or effect. When the 
 | Anti-Pattern | Fix |
 |---|---|
 | `create_order(items, user, tx, dry_run, async_mode, priority)` | Group into `OrderRequest` struct |
-| `fn process(flag: bool)` — what's `process(true)`? | Split `process()` / `process_dry_run()`, or `enum Mode` |
+| `fn process(flag: bool)` called as `process(true)` — what's `true`? | Split `process()` / `process_dry_run()`, or use `enum Mode`; retain a predicate argument when call sites already explain it |
 | 300-line fn, 8 levels nesting | Extract helpers until top level reads like pseudocode |
 | `validate_and_save()` doing both | Split `validate() -> Result<()>` + `save()` |
 | `fn get_user(id)` writing metrics / updating LRU | Split the side effect out, or rename `fetch_and_cache_user()` (`naming-smell`) |
@@ -37,7 +37,7 @@ A function is a contract: given inputs, produce this output or effect. When the 
 
 ## Workflow
 1. Flag functions exceeding parameter or length budgets
-2. Replace boolean flags with named alternatives (split or config struct)
+2. Review boolean parameters at their call sites; split only when the value is ambiguous or the contracts genuinely diverge
 3. Extract deepest nesting into named helpers
 4. Audit names against side effects — update to match behavior
 5. Split query+command functions

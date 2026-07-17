@@ -9,6 +9,7 @@ Use this matrix to keep skill ownership explicit. Each query should have one pri
 | `use ConnectionState::*` causes unclear imports | `rust-import-hygiene` | `naming-smell` only for aliases |
 | Simplify nested `if let` with `let-else` | `rust-guard-clauses` | `error-silence` for lost error context |
 | Merge duplicate methods but preserve a test seam | `rust-api-consolidation` | `rust-structure-refactor` for broader decomposition |
+| Boolean parameter is ambiguous at the call site | `func-smell` | `naming-smell` for the parameter name; keep a clear predicate expression when splitting would duplicate behavior |
 | Replace `bool` plus `Option` with explicit states | `rust-state-machine` | `encode-invariant` for the type invariant |
 | Split an 800-line function or module | `rust-structure-refactor` | `architecture-entropy-review` if ownership or routes multiply |
 | Review a large refactor for duplicate owners | `architecture-entropy-review` | narrower smell skill for local evidence |

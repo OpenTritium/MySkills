@@ -11,6 +11,7 @@ description: 'Review and correct ERROR/WARN/INFO/DEBUG/TRACE levels in Rust `tra
 - Use the official order: `ERROR < WARN < INFO < DEBUG < TRACE`. A `DEBUG` filter includes `ERROR`–`DEBUG`; `TRACE` includes all five.
 - Select level by significance first; control volume with sampling, aggregation, rate limiting, metrics, or removal.
 - Use a span for a period of work and context; use an event for a moment within that span.
+- Keep review and edit scope proportional to the finding. A broad level change needs a semantic reason at each call site; do not mass-rewrite events solely to reduce warning volume when filtering, sampling, aggregation, or metrics would address the operational cost.
 
 | Level | Use for |
 |---|---|
@@ -38,6 +39,7 @@ description: 'Review and correct ERROR/WARN/INFO/DEBUG/TRACE levels in Rust `tra
 3. Check filter boundary, export cost, cardinality, and sensitive data.
 4. Review retries by outcome: expected attempts usually `DEBUG`, real degradation `WARN`, terminal impact by severity.
 5. Keep repeated serious events serious; suppress repetition separately.
+6. Prioritize semantically incorrect levels and high-value clusters; treat broad noise cleanup as a separate, explicitly scoped change.
 
 ## Common Mistakes
 
