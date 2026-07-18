@@ -1,6 +1,6 @@
 ---
 name: testing-strategy
-description: 'Review Rust test strategy for behavioral coverage, determinism, failure diagnosis, and appropriate test levels. Use when adding or auditing unit, integration, async, property, snapshot, compile-fail, or fuzz tests, flaky tests, mocks, coverage, or test isolation. 中文触发：测试策略、单元测试、集成测试、属性测试、模糊测试、 flaky 测试'
+description: 'Review Rust test strategy for behavioral coverage, determinism, failure diagnosis, and appropriate test levels. Use when designing or auditing unit, integration, property, snapshot, compile-fail, or fuzz tests, flaky tests, mocks, isolation, behavior characterization, or regression tests. Use async-concurrency for production async/concurrency design and concurrency-testing for forced interleavings. 中文触发：测试策略、行为确认、特征测试、回归测试、happy path、unhappy path、重构前验证、单元测试、集成测试、属性测试、模糊测试、flaky 测试'
 ---
 
 # Rust Testing Reviewer
@@ -13,6 +13,15 @@ description: 'Review Rust test strategy for behavioral coverage, determinism, fa
 4. **Choose the right level** — Unit-test pure logic; integration-test wiring and persistence; use property/fuzz tests for invariants; use compile-fail tests for type/API guarantees.
 5. **Make failures diagnostic** — Assert exact error variants or meaningful predicates; include inputs and expected outcomes; do not reduce a test to `is_ok()`.
 6. **Test async lifecycle** — Exercise timeout, cancellation, task shutdown, and cleanup rather than only the happy path.
+
+## Confirm Behavior Before Changing Structure
+
+When a refactor or bug report leaves behavior uncertain, write focused tests through the stable boundary before changing production structure:
+
+1. Cover one relevant happy path and one relevant unhappy path. Add boundary, empty, or cancellation cases only when the contract requires them.
+2. For ambiguous existing behavior, write characterization tests that record what the system does, then confirm whether that behavior is intended.
+3. For a confirmed bug, write a regression test for the desired behavior; it should fail before the fix and pass after it.
+4. Keep the tests after the refactor. They are the contract guard, not temporary probes.
 
 ## Review Process
 

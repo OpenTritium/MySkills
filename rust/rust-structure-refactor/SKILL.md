@@ -1,6 +1,6 @@
 ---
 name: rust-structure-refactor
-description: "Guide Rust structural refactors by deciding when to inline short one-use functions, how to decompose long functions, how to split cohesive structs, and how to enforce module API boundaries without scattering pub(crate). Use for Rust refactoring, visibility design, module exports, god functions, god structs, helper extraction, function organization, and related Chinese requests such as 函数拆解、短函数内联、struct 拆分、模块导出、可见性控制、pub(crate) 滥用。"
+description: "Guide broad Rust structural changes: inline or decompose functions, split cohesive structs, and set module API visibility. Use when the question is a function, struct, or module boundary, ownership, or export; use rust-method-placement for the home of one operation, func-smell for one-function contract smells, and testing-strategy when behavior must be characterized before edits. 中文触发：结构重构、函数拆解、短函数内联、struct 拆分、模块导出、可见性控制、pub(crate) 滥用。"
 ---
 
 # Rust Structure Refactor
@@ -19,7 +19,16 @@ Use this skill to refactor Rust structure while preserving behavior and making o
 
 4. **Apply visibility at the boundary** — Start with private items and add only the visibility needed by the parent module or exported API. Centralize external exposure in `lib.rs`, `main.rs`, or the parent module's `pub use` statements.
 
-5. **Validate after each seam** — Run formatting, compile checks, focused tests, and then broader tests as appropriate. Compare behavior, public API, error types, and performance-sensitive paths before and after.
+5. **Validate after each seam** — Run formatting, compile checks, focused tests, and then broader tests as appropriate. Compare behavior, public API, error types, and performance-sensitive paths before and after. If behavior or a bug contract is uncertain, follow **Behavior Before Structure**.
+
+## Behavior Before Structure
+
+Do not refactor an uncertain behavior from intuition alone:
+
+- Write focused tests through the stable boundary before changing production structure.
+- Cover the relevant happy path and unhappy path; add edge cases only when they express the contract.
+- Characterize ambiguous legacy behavior first. For a confirmed bug, make the desired regression test fail before fixing it.
+- Refactor only after the tests make the behavior explicit, then keep them as the contract guard.
 
 ## Short Function Decisions
 
@@ -122,6 +131,7 @@ Keep `create_order` as the orchestration boundary and keep `parse`, `validate`, 
 - Are fields private and public symbols exported from one intentional module boundary?
 - Is every `pub(crate)` justified by a true crate-wide internal contract?
 - Are errors, ordering, locks, transactions, async cancellation, and cleanup unchanged?
+- If behavior was uncertain, did happy/unhappy characterization or regression tests precede the structural change?
 - Did focused tests and compile checks run after each structural seam?
 
 ## Reporting Format

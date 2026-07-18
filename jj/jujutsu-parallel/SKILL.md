@@ -1,12 +1,16 @@
 ---
 name: jujutsu-parallel
-description: "Coordinate multiple agents working in parallel on a Jujutsu repository. Use with jujutsu when several agents, processes, or workspaces need isolated changes, fixed-base development, unique bookmarks, handoff, integration, stale-workspace recovery, or conflict-safe stacked-diff workflows. Covers multi-agent development, parallel coding, workspace isolation, divergent changes, and Jujutsu collaboration."
+description: "Coordinate multiple agents working in parallel on a Jujutsu repository after the backend has been detected. Use with jujutsu when several agents, processes, or workspaces need isolated changes, fixed-base development, unique bookmarks, handoff, integration, stale-workspace recovery, or conflict-safe stacked-diff workflows. Covers multi-agent development, parallel coding, workspace isolation, divergent changes, and Jujutsu collaboration."
 allowed-tools: Bash(jj *)
 ---
 
 # Jujutsu Parallel Agents
 
 Use this skill together with jujutsu. It turns Jujutsu's safe concurrent-edit model into an operational protocol that minimizes stale workspaces, overlapping edits, and accidental history rewrites.
+
+## Activation Boundary
+
+Run `vcs-router` first, then use `jujutsu` only when it returns `vcs=jj`. A Git repository is outside this skill's scope. Do not run any `jj` command for a Git-only repository; use Git-native worktrees instead.
 
 ## Official Model
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "VCS Backend Router"
+  short_description: "Detect Git or Jujutsu before VCS operations"
+  default_prompt: "Use $vcs-router to detect the repository VCS backend before version-control operations."

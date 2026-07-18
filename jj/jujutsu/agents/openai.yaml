@@ -1,4 +1,4 @@
 interface:
-  display_name: "Jujutsu"
-  short_description: "Safe agent workflows for Jujutsu VCS"
-  default_prompt: "Use $jujutsu for safe, non-interactive Jujutsu version-control operations."
+  display_name: "Jujutsu Workflows"
+  short_description: "Operate safely after Jujutsu is detected"
+  default_prompt: "Use $jujutsu after $vcs-router confirms this repository uses Jujutsu."

@@ -9,10 +9,16 @@ Use this matrix to keep skill ownership explicit. Each query should have one pri
 | `use ConnectionState::*` causes unclear imports | `rust-import-hygiene` | `naming-smell` only for aliases |
 | Simplify nested `if let` with `let-else` | `rust-guard-clauses` | `error-silence` for lost error context |
 | Merge duplicate methods but preserve a test seam | `rust-api-consolidation` | `rust-structure-refactor` for broader decomposition |
+| Decide whether an extracted Rust helper belongs on a type, in a newtype, or as a free function | `rust-method-placement` | `rust-structure-refactor` for broader decomposition; `encode-invariant` for newtype representation |
+| AI-generated Rust refactor adds a small helper and its owner is unclear | `rust-method-placement` | `rust-structure-refactor` for the surrounding function or module split |
+| Add method-like behavior to a Rust type that cannot receive an inherent method | `rust-method-placement` | `encode-invariant` when a local wrapper is a better owner |
+| A local function has parameter explosion, hidden effects, or mixed abstraction levels | `func-smell` | `rust-structure-refactor` for broader decomposition; `rust-method-placement` for ownership |
 | Boolean parameter is ambiguous at the call site | `func-smell` | `naming-smell` for the parameter name; keep a clear predicate expression when splitting would duplicate behavior |
 | Replace `bool` plus `Option` with explicit states | `rust-state-machine` | `encode-invariant` for the type invariant |
 | Split an 800-line function or module | `rust-structure-refactor` | `architecture-entropy-review` if ownership or routes multiply |
 | Review a large refactor for duplicate owners | `architecture-entropy-review` | narrower smell skill for local evidence |
+| Review a broad refactor in a Git or Jujutsu repository | `architecture-entropy-review` | `vcs-router` for backend selection and matching command group |
+| Refactor or fix a bug while the behavior contract is uncertain | `testing-strategy` | `rust-structure-refactor` after happy/unhappy characterization or regression tests establish the contract |
 
 ## Local Code Quality
 
@@ -29,7 +35,7 @@ Use this matrix to keep skill ownership explicit. Each query should have one pri
 
 | Query | Primary skill | Secondary boundary |
 |---|---|---|
-| `Send`, cancellation, channel, or deadlock design | `async-concurrency` |
+| Production `Send`, cancellation, channel, lock, or deadlock design | `async-concurrency` | `concurrency-testing` only for deterministic behavioral coverage |
 | Choose std versus async locks, atomics, channels, semaphores, or notifications | `async-concurrency` | `concurrency-testing` for behavioral coverage; `resource-lifecycle` for ownership and cleanup |
 | Choose MPSC versus MPMC or sync versus async channels | `async-concurrency` | `concurrency-testing` for ordering/backpressure coverage; `rust-ecosystem` for crate integration |
 | Choose a domain-specific concurrency crate instead of std/Tokio primitives | `async-concurrency` | `rust-ecosystem` for dependency compatibility and supply-chain review |
@@ -41,9 +47,15 @@ Use this matrix to keep skill ownership explicit. Each query should have one pri
 | Unsafe code, FFI, raw pointers, `unsafe impl Send/Sync`, or `SAFETY` | `unsafe-checker` |
 | Test-only `set_var`/`remove_var` or audit a low-unsafe Rust codebase for hidden FFI and manual thread-safety assumptions | `unsafe-checker` | `testing-strategy` for general isolation; `concurrency-testing` when a deterministic interleaving is required |
 | Cargo features, crate compatibility, or MSRV | `rust-ecosystem` |
-| Behavioral, deterministic, or integration test design | `testing-strategy` |
+| Unit, integration, property, characterization, regression, or general behavioral test design | `testing-strategy` | `async-concurrency` for production async design; `concurrency-testing` for forced interleavings |
 | Force and verify TOCTOU, double-consumption, order-dependent, or race interleavings in tests | `concurrency-testing` | `testing-strategy` for general test design; `async-concurrency` for production concurrency design |
 | Test cancellation/retry recovery, lost wakeups, ABA/version, or queue capacity/closure races | `concurrency-testing` | `async-concurrency` for the production lifecycle or synchronization design |
+
+## Version Control
+
+| Detect the repository backend before a status, diff, log, mutation, or workspace operation | `vcs-router` | `jujutsu` only when it returns `vcs=jj` |
+| Run status, diff, log, mutation, or workspace operations after `vcs=jj` is selected | `jujutsu` | `vcs-router` for detection; `jujutsu-parallel` for parallel workspaces |
+| Coordinate multiple agents in Jujutsu workspaces | `jujutsu-parallel` | `vcs-router` for detection and `jujutsu` for the base workflow |
 
 ## Maintenance Rules
 

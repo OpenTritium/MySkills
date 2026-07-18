@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rust Method Placement"
+  short_description: "Choose Rust methods, extension traits, or functions"
+  default_prompt: "Use $rust-method-placement to decide where this Rust helper or operation should live."

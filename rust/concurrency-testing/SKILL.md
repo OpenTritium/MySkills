@@ -1,6 +1,6 @@
 ---
 name: concurrency-testing
-description: "Design and review deterministic Rust concurrency tests that force and verify legal interleavings, safety invariants, histories, and bounded recovery. Use when testing TOCTOU windows, double or duplicate consumption, lost updates, order-dependent behavior, stale writes, cancellation and retry recovery, lost wakeups, ABA/version tokens, queue capacity or closure races, channels, locks, atomics, tasks, or logical race conditions. 中文触发：并发测试、竞态测试、时序依赖、TOCTOU、双重消费、重复消费、竞态条件、交错测试、并发不变量。"
+description: "Design and review deterministic Rust concurrency tests that force and verify legal interleavings, safety invariants, histories, and bounded recovery. Use when a test must expose TOCTOU windows, duplicate consumption, lost updates, stale writes, cancellation/retry races, lost wakeups, ABA/version issues, queue closure or capacity races, or logical interleavings. Use async-concurrency for production task/lock/channel design and testing-strategy for general test levels. 中文触发：并发测试、竞态测试、时序依赖、TOCTOU、双重消费、重复消费、竞态条件、交错测试、并发不变量。"
 ---
 
 # Rust Concurrency Testing

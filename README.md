@@ -74,6 +74,7 @@ Skills remain under stable source roots, but the index groups them by the questi
 ### Design And Architecture
 
 - `architecture-entropy-review` — architectural drift after large refactors
+- `rust-method-placement` — choose methods, extension traits, newtypes, or free functions
 - `rust-api-consolidation` — merge or remove Rust APIs while preserving real seams
 - `rust-ecosystem` — Cargo, crate integration, features, compatibility, and dependency risk
 - `rust-structure-refactor` — function, struct, and module-boundary refactoring
@@ -94,7 +95,8 @@ Skills remain under stable source roots, but the index groups them by the questi
 
 ### Version Control
 
-- `jujutsu` — safe agent workflows for Jujutsu version control
+- `vcs-router` — detect Git or Jujutsu before VCS operations
+- `jujutsu` — safe Jujutsu workflows after backend detection
 - `jujutsu-parallel` — parallel Jujutsu workspaces for multiple agents
 
 See [test-triggers.md](test-triggers.md) for primary skill ownership and overlap boundaries. See [AGENTS.md](AGENTS.md) for contribution and validation rules.

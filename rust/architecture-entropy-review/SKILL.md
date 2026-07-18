@@ -27,10 +27,11 @@ If no design document exists, infer the route from repeated existing usage and l
 
 ### 2. Trace the before/after shape
 
-Use the smallest useful search surface:
+Use the smallest useful search surface. First apply `vcs-router`, then use only the command group matching its result:
 
-    git diff --stat
-    git diff
+    Git: git --no-pager diff --stat
+         git --no-pager diff
+    JJ:  jj --no-pager diff --git
     rg 'old_symbol|new_symbol|domain_term|feature_flag'
 
 Then trace changed symbols from callers to callees, inspect public exports and visibility, and compare production paths with tests and fixtures. For Rust, use module declarations, pub use, visibility, trait implementations, compiler diagnostics, LSP references, and focused cargo checks/tests when available.
@@ -75,6 +76,8 @@ Before writing a finding, identify one concrete caller-to-behavior path and at l
 - a widened dependency or visibility edge;
 - a reachable migration branch without an exit condition;
 - a test that proves the new route does not protect the contract.
+
+When a refactor or bug report leaves the behavior contract uncertain, require focused happy/unhappy characterization or regression tests through the stable boundary before endorsing a new owner or route. Use `testing-strategy` for the test design; do not infer intended behavior from the new structure.
 
 Use severity by impact:
 

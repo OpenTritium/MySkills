@@ -1,6 +1,6 @@
 ---
 name: rust-guard-clauses
-description: "Review Rust functions for fail-fast guards, early returns, `?`, `let-else`, validation order, and clear error paths without flattening meaningful state handling. Use when reducing nested control flow, refactoring Rust functions, or choosing between a guard, `if let`, `let-else`, and `match`. 中文触发：guard、守卫语句、提前返回、尽早失败、let else、错误路径、减少嵌套"
+description: "Review Rust control-flow shape for fail-fast guards, early returns, `?`, `let-else`, validation order, and clear error paths without flattening meaningful state handling. Use when reducing nested conditionals or choosing between a guard, `if let`, `let-else`, and `match`; use func-smell for broader function-contract problems and error-silence for lost error meaning. 中文触发：guard、守卫语句、提前返回、尽早失败、let else、错误路径、减少嵌套"
 ---
 
 # Rust Guard Clauses

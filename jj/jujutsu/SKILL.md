@@ -1,35 +1,39 @@
 ---
 name: jujutsu
-description: "**REQUIRED** - Activate first for any Git or Jujutsu version-control operation, including status, diff, commit, branch, rebase, push, restore, bookmark, workspace, or conflict resolution. If .jj/ exists, treat the repository as Jujutsu-managed. Provides safe, non-interactive jj workflows for agents; use jujutsu-parallel for multi-agent workspace coordination."
-allowed-tools: Bash(jj *)
+description: "Operate safely on a Jujutsu repository after `vcs-router` detects `vcs=jj`. Use for Jujutsu status, diff, log, commit, branch, rebase, push, restore, bookmark, workspace, and conflict operations. Do not use for Git-only repositories; use `vcs-router` first and `jujutsu-parallel` only for parallel Jujutsu workspaces. 中文触发：Jujutsu、jj、变更、书签、工作区、冲突、并行工作区。"
+allowed-tools:
+  - Bash(jj *)
 ---
 
 # Jujutsu (jj)
 
-Use this skill for normal Jujutsu operations. It is checked against jj v0.43.0; inspect local help when a command differs.
+Use this skill only after `vcs-router` confirms `vcs=jj`. The workflow is checked against jj v0.43.0; inspect local help when a command differs.
 
 ## Mandatory Agent Rules
 
-1. Activate this skill before any VCS command. In a non-colocated repository, use jj commands rather than raw Git.
-2. Use --no-pager for commands that print output:
+1. Run `vcs-router` first and continue only when it returns `vcs=jj`.
+2. Use only Jujutsu commands; never switch to raw Git workflow commands inside this skill.
+3. Use --no-pager for commands that print output:
 
        jj --no-pager status
        jj --no-pager log
        jj --no-pager diff --git
        jj --no-pager show <change-id>
 
-3. Use -m for descriptions or mutations that would otherwise open an editor:
+4. Use -m for descriptions or mutations that would otherwise open an editor:
 
        jj desc -m "message"
        jj new -m "message"
        jj commit -m "message"
        jj squash -m "message"
 
-4. Run jj st after mutations such as commit, squash, abandon, rebase, restore, undo, or bookmark changes.
-5. Avoid interactive commands in an agent environment: jj split, jj squash -i, diff editors, and external jj resolve tools. Edit conflict files directly when practical.
-6. Do not push unless the user explicitly asks. Before pushing, inspect jj st, jj --no-pager log, jj --no-pager diff --git, and the target bookmark.
+5. Run `jj st` after Jujutsu mutations such as commit, squash, abandon, rebase, restore, undo, or bookmark changes.
+6. Avoid interactive commands in an agent environment: jj split, jj squash -i, diff editors, and external jj resolve tools. Edit conflict files directly when practical.
+7. Do not push unless the user explicitly asks. Before pushing, inspect jj status, log, diff, and bookmark state.
 
 ## Core Model
+
+The following sections apply only when `vcs=jj`.
 
 - The repository graph is the source of truth; the working copy is a commit, referenced as @.
 - Most jj commands snapshot the working copy at the beginning, record an operation, and update the working copy afterward.
@@ -38,6 +42,8 @@ Use this skill for normal Jujutsu operations. It is checked against jj v0.43.0; 
 - Revisions are mutable. Conflicts can be recorded in commits, descendants may be automatically rebased, and operations can be inspected or undone.
 
 ## Essential Workflow
+
+When `vcs=jj`:
 
 ### Start Work
 
@@ -136,7 +142,7 @@ For a non-colocated jj repository, use jj's Git integration:
        jj git fetch -b <branch-name>
        jj git push -b <bookmark-name>
 
-In a colocated workspace containing both .jj/ and .git/, mixing jj and Git commands is supported, but prefer jj for mutations and read-only Git commands for inspection. Git changes are imported by jj commands. Use jj git import/export explicitly when working with a non-colocated Git backend.
+When `.jj/` and `.git/` coexist, `vcs-router` selects `vcs=jj`; keep workflow commands in jj. Use `jj git import` or `jj git export` only for the explicit Git integration boundary.
 
 Initialize or convert repositories with:
 
@@ -180,4 +186,4 @@ Alternatively edit the conflict files directly in the conflicted working copy. D
 | Update stale workspace | jj workspace update-stale |
 | Run across revisions | jj run -r '<revset>' -- <command> |
 
-Before considering a VCS operation complete, inspect jj st. Before considering a change complete, inspect its diff, description, evolution, and bookmark state.
+Before considering a Jujutsu operation complete, inspect `jj st`, its diff, description, evolution, and bookmark state.

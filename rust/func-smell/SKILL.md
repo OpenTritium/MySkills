@@ -1,6 +1,6 @@
 ---
 name: func-smell
-description: 'Review function and method design for parameter explosion, boolean flags, hidden side effects, deep nesting, god functions, output arguments, long bodies, and mixed abstraction levels. Keywords: function, method, parameter, boolean flag, side effect, nesting, god function, long method, cyclomatic complexity, SRP, single responsibility, refactor, extract method, 函数, 方法, 重构'
+description: 'Review local Rust function and method contract smells: parameter explosion, boolean flags, hidden side effects, deep nesting, god functions, output arguments, long bodies, and mixed abstraction levels. Use when the problem is the shape or contract of one function or method; use rust-structure-refactor for broader decomposition and rust-method-placement for ownership or API placement. 中文触发：函数参数过多、布尔参数、隐藏副作用、函数过长、函数嵌套、上帝函数、输出参数、函数气味。'
 ---
 
 # Function Smell Reviewer

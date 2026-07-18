@@ -1,6 +1,6 @@
 ---
 name: async-concurrency
-description: 'Review Rust async and concurrency design for task ownership, cancellation, synchronization primitive choice, backpressure, blocking, and domain-specific concurrency crate selection. Use when code uses async/await, Tokio, threads, Send/Sync, channels, locks, atomics, spawn, timeout, select, shutdown, or deadlock, especially when choosing std versus async locks, MPSC versus MPMC channels, or evaluating a specialized crate through its public API and benchmarks. 中文触发：异步、并发、取消、死锁、任务、通道、锁原语、标准库 Mutex、Tokio Mutex、MPSC、MPMC、并发库选择'
+description: 'Review Rust production async and concurrency design for task ownership, cancellation, synchronization primitive choice, backpressure, blocking, and domain-specific concurrency crate selection. Use when choosing async tasks, locks, channels, atomics, timeouts, shutdown, or deadlock behavior; use concurrency-testing for deterministic interleaving tests and testing-strategy for general test design. 中文触发：异步设计、并发设计、取消、死锁、任务、通道、锁原语、标准库 Mutex、Tokio Mutex、MPSC、MPMC、并发库选择'
 ---
 
 # Async Concurrency Reviewer
