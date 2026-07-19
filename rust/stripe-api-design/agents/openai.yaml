@@ -1,0 +1,4 @@
+interface:
+  display_name: "Stripe API Design"
+  short_description: "Design and review resilient resource APIs"
+  default_prompt: "Use $stripe-api-design to design or review a resource-oriented API contract."

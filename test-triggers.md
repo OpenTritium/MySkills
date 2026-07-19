@@ -31,6 +31,15 @@ Use this matrix to keep skill ownership explicit. Each query should have one pri
 | Reduce nested loops or replace an unnecessary sort | `big-o-optimizer` | `zero-alloc` for allocation cost |
 | Avoid allocations in a hot path | `zero-alloc` | `big-o-optimizer` for algorithmic cost |
 
+## External API Design
+
+| Query | Primary skill | Secondary boundary |
+|---|---|---|
+| Design or review a public HTTP/JSON resource API | `stripe-api-design` | `rust-method-placement` or `rust-structure-refactor` for Rust ownership and module structure |
+| Define idempotent writes, cursor pagination, structured errors, or API versioning | `stripe-api-design` | `error-silence` or `rust-snafu` for Rust error implementation; `testing-strategy` for behavioral coverage |
+| Design or review webhook/event delivery semantics | `stripe-api-design` | `async-concurrency` for task ownership and cancellation; `concurrency-testing` for deterministic duplicate/order/retry tests |
+| Review competing API sources of truth across modules or routes | `architecture-entropy-review` | `stripe-api-design` for the external wire contract |
+
 ## Language And Runtime
 
 | Query | Primary skill | Secondary boundary |
