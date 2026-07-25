@@ -1,13 +1,13 @@
 ---
 name: rust-structure-refactor
-description: "Guide broad Rust structural changes: inline or decompose functions, split cohesive structs, and set module API visibility. Use when the question is a function, struct, or module boundary, ownership, or export; use rust-method-placement for the home of one operation, func-smell for one-function contract smells, and testing-strategy when behavior must be characterized before edits. 中文触发：结构重构、函数拆解、短函数内联、struct 拆分、模块导出、可见性控制、pub(crate) 滥用。"
+description: "Guide broad Rust structural changes: inline or decompose functions, split cohesive structs, and set module API visibility. Use when the question is a function, struct, or module boundary, ownership, export, or test-only impl organization; use rust-method-placement for the home of one operation, rust-func-smell for one-function contract smells, and rust-testing-strategy when behavior must be characterized before edits. 中文触发：结构重构、函数拆解、短函数内联、struct 拆分、模块导出、可见性控制、pub(crate) 滥用、测试专用 impl、cfg(test) 方法组织。"
 ---
 
 # Rust Structure Refactor
 
 ## Overview
 
-Use this skill to refactor Rust structure while preserving behavior and making ownership, responsibilities, and API boundaries explicit. Focus on whether a symbol deserves to exist, where it should live, and which visibility should expose it; defer naming-only issues to `naming-smell`, function contract smells to `func-smell`, and type invariants to `encode-invariant`.
+Use this skill to refactor Rust structure while preserving behavior and making ownership, responsibilities, and API boundaries explicit. Focus on whether a symbol deserves to exist, where it should live, and which visibility should expose it; defer naming-only issues to `rust-naming-smell`, function contract smells to `rust-func-smell`, and type invariants to `rust-encode-invariant`.
 
 ## Refactoring Workflow
 
@@ -78,9 +78,36 @@ struct Pricing {
 
 Then give each component the smallest methods needed to maintain its own rules. Keep fields private and expose operations or validated constructors instead of a bag of getters and setters.
 
-Prefer an enum when a large struct encodes mutually exclusive states with `Option` fields or booleans. Prefer a newtype when a field or parameter has a domain identity, validation rule, or argument-swap risk; use `encode-invariant` for the type-level details.
+Prefer an enum when a large struct encodes mutually exclusive states with `Option` fields or booleans. Prefer a newtype when a field or parameter has a domain identity, validation rule, or argument-swap risk; use `rust-encode-invariant` for the type-level details.
 
 Do not split merely because a struct has many fields. Avoid one-field wrappers with no invariant, `*Data`/`*Context` dumping grounds, duplicated copies of the same state, and structs whose methods still operate on unrelated fields. When splitting, update constructors, methods, tests, serialization, and ownership together.
+
+## Test-only Impl Organization
+
+Group several helpers used only by same-module unit tests in one `#[cfg(test)] mod tests` and put a single `impl` for the production type inside that module. This keeps test methods out of the production implementation and applies the configuration gate to the whole group:
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::Order;
+
+    impl Order {
+        fn with_test_items(items: Vec<Item>) -> Self { unimplemented!() }
+        fn assert_valid_for_test(&self) { unimplemented!() }
+    }
+}
+```
+
+When a test API must be called outside the `tests` module but remains crate-internal, use a dedicated module-level `#[cfg(test)] impl` with the narrowest required visibility. Keep a method-level `#[cfg(test)]` for an isolated test API in an otherwise production `impl`; do not repeat the attribute on every method in a grouped test-only impl.
+
+```rust
+#[cfg(test)]
+impl Order {
+    pub(super) fn raw_for_test() -> Self { unimplemented!() }
+}
+```
+
+An integration test that compiles the library as an external dependency does not enable the library's `cfg(test)`. If an external test harness must call a test API, expose it through an explicit `test-support` feature or a dedicated test-support crate instead of assuming `#[cfg(test)]` is available.
 
 ## Visibility And Module Exports
 
@@ -95,6 +122,8 @@ Use the narrowest visibility that expresses the dependency:
 | `pub` | Reachable outside the crate when the path is public | Deliberate external API |
 
 Prefer a single export boundary. For example, let `lib.rs` declare `mod orders;` and expose `pub use orders::{Order, create_order};`. The `orders` module can keep helpers private and expose only the symbols that its parent intentionally re-exports.
+
+Treat visibility as a module-boundary decision, not an implementation convenience. Keep implementation symbols private and widen the parent boundary or its `pub use` re-exports deliberately; scattering `pub(crate)` through leaf implementations makes dependency direction and the intended API harder to read.
 
 Use `pub(crate)` only after identifying multiple sibling consumers and documenting why `pub(super)` or a private re-export cannot express the relationship. Do not add `pub(crate)` to make a privacy error disappear, and do not make every leaf module `pub`.
 

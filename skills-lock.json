@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "skills": {
+    "architecture-entropy-review": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/architecture-entropy-review/SKILL.md",
+      "computedHash": "3a86025bf58853ca69a78a6501c2c65e2ce7a8e4ebdf8b8decf0c13a7639d202"
+    },
+    "async-concurrency": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/async-concurrency/SKILL.md",
+      "computedHash": "d5b240c396c9825d6460d633af0155bba7437a3251e8757475cdbedbe00ab633"
+    },
+    "big-o-optimizer": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/big-o-optimizer/SKILL.md",
+      "computedHash": "35a3a918fb07b7b0c2e953fc822faf635a37711555614c7a6d8c014febdeaa99"
+    },
+    "concurrency-testing": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/concurrency-testing/SKILL.md",
+      "computedHash": "1446e36fe9d838cacbcbfba703ceb8a08e4e9051dac5c244780e50cd7de18f23"
+    },
+    "encode-invariant": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/encode-invariant/SKILL.md",
+      "computedHash": "40c6660be60164a13d98ecad7c7ac5d616ce83f2dc72c7003f25306bb36c0730"
+    },
+    "error-silence": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/error-silence/SKILL.md",
+      "computedHash": "1614c9a9e4919ee93e07573b8fa4b958059a2efccb3f6738d3d5a763f487f80e"
+    },
+    "func-smell": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/func-smell/SKILL.md",
+      "computedHash": "3028945900e971cf8ccb0c535f717fc3edc17828a0dcded2a6bdfb4ffc0eac2f"
+    },
+    "high-snr-comment": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/high-snr-comment/SKILL.md",
+      "computedHash": "3adc2ac3e77d6dca4267e440ff194f68bc6ba8ce3235e2ab6462d3b0b4844e64"
+    },
+    "high-snr-log": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/high-snr-log/SKILL.md",
+      "computedHash": "97f06066be7b626aac7cfef35535450045296841727c316fb72d0ace0bad0dce"
+    },
+    "jujutsu": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "jj/jujutsu/SKILL.md",
+      "computedHash": "f2de5adf8f63776068d4eba24a9b09ea09ec8dfd2427acebb2d736801fb25fbb"
+    },
+    "jujutsu-parallel": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "jj/jujutsu-parallel/SKILL.md",
+      "computedHash": "1752fd4dfcdfd03908f4b0b4e840759253a8cfd8985fc42dd7bd604252cedbf7"
+    },
+    "log-level": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/log-level/SKILL.md",
+      "computedHash": "a02f9c58c8081040d231e7c48f4ee4a1869dc77b2949e02e30fe984637a80c9b"
+    },
+    "naming-smell": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/naming-smell/SKILL.md",
+      "computedHash": "8ff692b05bf11db81ef00ccda3aacf8a439148b6fd1a5948cac9beb7b4592bc3"
+    },
+    "resource-lifecycle": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/resource-lifecycle/SKILL.md",
+      "computedHash": "608509a1bb2c8043032575954c2c3a913e200b411c3f131ac8c96d05d5dfbe75"
+    },
+    "rust-api-consolidation": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/rust-api-consolidation/SKILL.md",
+      "computedHash": "4d26b11586899e9b4fca98cca2ae4ba81b7d330370bfada29959a9782ad7bcea"
+    },
+    "rust-ecosystem": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/rust-ecosystem/SKILL.md",
+      "computedHash": "3f120405a97039d8698ca1f0d1aacfb2172c3b5a0969e37d746366415656f1a4"
+    },
+    "rust-guard-clauses": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/rust-guard-clauses/SKILL.md",
+      "computedHash": "f30195e3f927e79bb863202a383cfd2f1f6830170d0772c211db07ea9b6847e6"
+    },
+    "rust-import-hygiene": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/rust-import-hygiene/SKILL.md",
+      "computedHash": "193b8496f76afb4260b2e3c29b21fa4a4662886eb552ea8d6f24e7149ea43fc1"
+    },
+    "rust-method-placement": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/rust-method-placement/SKILL.md",
+      "computedHash": "8e52deae11d9f206c5ae28e2258d43baae39212b02b4af6b63a6ac98c8114824"
+    },
+    "rust-snafu": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/rust-snafu/SKILL.md",
+      "computedHash": "f434f727739581538bd4957304d40cace62c6777be812675d78f025fbae452a8"
+    },
+    "rust-state-machine": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/rust-state-machine/SKILL.md",
+      "computedHash": "aba7af0e987bd0b479f688e03ecd6fcd0ef172f6a42667784102c7e16d0487a6"
+    },
+    "rust-structure-refactor": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/rust-structure-refactor/SKILL.md",
+      "computedHash": "84daff389009d682b81223c127844127718fe90eab3d6e3cad9a1ed427b438cb"
+    },
+    "stripe-api-design": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/stripe-api-design/SKILL.md",
+      "computedHash": "a4083c0025dbfd5f5e9340bc68e9b7e9abfe8012888834292daac5bb3c3d5d40"
+    },
+    "testing-strategy": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/testing-strategy/SKILL.md",
+      "computedHash": "407b8c040f5258a3e97d40fae1d2c61bb2b15880814cc1a8e93672920e7e4b96"
+    },
+    "unsafe-checker": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/unsafe-checker/SKILL.md",
+      "computedHash": "baedc2b6cb9738fc441417bfaadea9762e39a9faaeca0460f8d3c67f0661fabf"
+    },
+    "vcs-router": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "jj/vcs-router/SKILL.md",
+      "computedHash": "6a2def24f1503a9b6710ac91ec962439164061755f59b591f7cb4a54893422e3"
+    },
+    "zero-alloc": {
+      "source": "OpenTritium/MySkills",
+      "sourceType": "github",
+      "skillPath": "rust/zero-alloc/SKILL.md",
+      "computedHash": "cdbd81523d551f007030cafe76f9a0649c27cfe836368d785c726d59ce200be0"
+    }
+  }
+}

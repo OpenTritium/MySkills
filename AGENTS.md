@@ -2,7 +2,9 @@
 
 ## Repository Layout
 
+- `go/` contains Go language, design, review, tooling, and library skills.
 - `rust/` contains Rust language, design, review, and tooling skills.
+- `http/` contains language-neutral HTTP and API design skills.
 - `jj/` contains Jujutsu version-control skills.
 - Keep existing skill paths stable unless a migration alias or explicit compatibility plan exists.
 
@@ -16,7 +18,7 @@
 
 ## Boundary Rules
 
-- Use `architecture-entropy-review` for cross-module or cross-route architectural drift.
+- Use `rust-architecture-entropy-review` for cross-module or cross-route architectural drift.
 - Use `rust-structure-refactor` for local function, struct, and module decomposition.
 - Use narrower skills for naming, errors, tests, async behavior, resources, and type invariants.
 - Do not introduce a second skill with the same primary trigger without documenting the routing boundary.
@@ -26,7 +28,7 @@
 Run the skill validator for every changed or added skill:
 
 ```bash
-python3 /home/tritium/.codex/skills/.system/skill-creator/scripts/quick_validate.py rust/<skill-name>
+python3 /home/tritium/.codex/skills/.system/skill-creator/scripts/quick_validate.py <skill-path>
 ```
 
 Check frontmatter, README membership, trigger ownership, related-skill boundaries, and template residue before handoff.

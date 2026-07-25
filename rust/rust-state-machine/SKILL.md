@@ -50,6 +50,6 @@ impl Connection {
 }
 ```
 
-Use `encode-invariant` for the type-level representation of an invariant, `rust-guard-clauses` for local early exits, and `resource-lifecycle` or `async-concurrency` for deeper cleanup and task ownership review.
+Use `rust-encode-invariant` for the type-level representation of an invariant, `rust-guard-clauses` for local early exits, and `rust-resource-lifecycle` or `rust-async-concurrency` for deeper cleanup and task ownership review.
 
 Report the invalid state or transition, smallest safe model change, affected callers, and transition tests added or checked.

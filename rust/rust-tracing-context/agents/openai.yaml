@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rust Tracing Context"
+  short_description: "Correlate async tasks with tracing context"
+  default_prompt: "Use $rust-tracing-context to review Rust async tracing context propagation and task correlation."

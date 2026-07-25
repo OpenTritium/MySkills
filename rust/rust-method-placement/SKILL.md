@@ -1,6 +1,6 @@
 ---
 name: rust-method-placement
-description: "Choose the owner and API form of a Rust operation or extracted helper: inherent or associated method, trait or extension trait, domain newtype, or free function. Use when a candidate behavior needs placement after helper extraction, API review, primitive-domain analysis, or foreign-type extension. Use rust-structure-refactor for broad function/struct/module decomposition, func-smell for one-function contract smells, and rust-api-consolidation for merging or removing existing APIs. 中文触发：方法归属、函数还是方法、自由函数、关联方法、扩展方法、扩展 trait、newtype、新增小函数、AI 重构新增小函数。"
+description: "Choose the owner and API form of a Rust operation or extracted helper: inherent or associated method, trait or extension trait, domain newtype, or free function. Use when a candidate behavior needs placement after helper extraction, API review, primitive-domain analysis, or foreign-type extension. Use rust-structure-refactor for broad function/struct/module decomposition, rust-func-smell for one-function contract smells, and rust-api-consolidation for merging or removing existing APIs. 中文触发：方法归属、函数还是方法、自由函数、关联方法、扩展方法、扩展 trait、newtype、新增小函数、AI 重构新增小函数。"
 ---
 
 # Rust Method Placement
@@ -45,7 +45,7 @@ The objective is one obvious home for the next rule change, not the maximum numb
 
 ## Newtype Test
 
-Introduce a newtype only when it has a distinct domain identity, a meaningful invariant or misuse risk, and at least one operation or boundary behavior to own. Otherwise prefer the existing type or a free function. Consult `encode-invariant` for representation, serde, boxed storage, and invalid-state details.
+Introduce a newtype only when it has a distinct domain identity, a meaningful invariant or misuse risk, and at least one operation or boundary behavior to own. Otherwise prefer the existing type or a free function. Consult `rust-encode-invariant` for representation, serde, boxed storage, and invalid-state details.
 
 ## Free Function Boundary
 
@@ -65,10 +65,10 @@ Prefer a free function when no receiver is primary, inputs are symmetric, unrela
 ## Related Skills And Boundaries
 
 - Use `rust-structure-refactor` for broader function, struct, and module decomposition; use this skill for the home of a particular operation.
-- Use `encode-invariant` for type-level newtype design and invariant encoding.
-- Use `func-smell` for parameter explosion, hidden effects, mixed abstraction levels, and other function-shape problems.
+- Use `rust-encode-invariant` for type-level newtype design and invariant encoding.
+- Use `rust-func-smell` for parameter explosion, hidden effects, mixed abstraction levels, and other function-shape problems.
 - Use `rust-api-consolidation` for merging, removing, or preserving existing APIs.
-- Use `architecture-entropy-review` when a refactor creates duplicate owners, parallel routes, or cross-module drift.
+- Use `rust-architecture-entropy-review` when a refactor creates duplicate owners, parallel routes, or cross-module drift.
 
 ## Reporting Format
 

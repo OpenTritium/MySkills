@@ -1,32 +1,15 @@
 # MySkills
 
-面向 Codex 和其他 Agent 的开发 skills，包含：
+面向 Codex 和其他 Agent 的开发 skills，包含 Go、Rust、HTTP/API 和 Git/Jujutsu。
 
-- **Go**：代码质量、并发、数据库、依赖注入、GraphQL、gRPC、OpenAPI、测试、性能和可观测性
-- **Rust**：架构、异步并发、错误处理、类型设计、安全、测试和性能审查
-- **HTTP/API**：公共 HTTP/JSON API 设计
-- **版本控制**：Git、Jujutsu 工作流
+## 安装
 
-## 使用 Bun 安装
+当前系统中的 skills 目录：
 
-当前系统中的 skills 目录分布如下：
-
-- 通用项目目录：`./.agents/skills`
 - 通用全局目录：`~/.agents/skills`
 - Codex 全局目录：`~/.codex/skills`
 
-安装到当前项目的 `.agents/skills`：
-
-```bash
-bunx skills add OpenTritium/MySkills \
-  --agent universal \
-  --skill '*' \
-  --full-depth \
-  --copy \
-  --yes
-```
-
-安装到通用全局目录 `~/.agents/skills`：
+使用 Bun 安装到通用全局目录 `~/.agents/skills`：
 
 > skills CLI 当前将 `cline` 的全局路径映射到 `~/.agents/skills`；这里使用 `cline` 只是为了写入通用目录。
 
@@ -40,28 +23,24 @@ bunx skills add OpenTritium/MySkills \
   --yes
 ```
 
-安装到 Codex 全局目录 `~/.codex/skills`：
+`skills` CLI 的 `--agent codex` 在当前系统仍写入 `~/.agents/skills`，不会写入 Codex 专用目录。安装到 `~/.codex/skills` 请使用 Codex 自带安装器；在本仓库根目录执行以下命令可安装全部 Go skills：
 
 ```bash
-bunx skills add OpenTritium/MySkills \
-  --global \
-  --agent codex \
-  --skill '*' \
-  --full-depth \
-  --copy \
-  --yes
+python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
+  --repo OpenTritium/MySkills \
+  --ref master \
+  --path go/golang-* \
+  --dest ~/.codex/skills
 ```
 
-只安装单个 skill，例如安装 `golang-graphql` 到 Codex：
+只安装单个 skill，例如使用 Bun 安装 `golang-graphql` 到通用全局目录：
 
 ```bash
 bunx skills add OpenTritium/MySkills \
   --global \
-  --agent codex \
+  --agent cline \
   --skill golang-graphql \
   --full-depth \
   --copy \
   --yes
 ```
-
-项目级安装时去掉 `--global`；项目级 `universal` 和 `codex` 都写入 `./.agents/skills`，全局安装则分别写入各自的全局目录。

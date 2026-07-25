@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rust Logging Review"
+  short_description: "Review Rust logs, levels, and telemetry"
+  default_prompt: "Use $rust-logging-review to review Rust logging and tracing for signal, severity, context, and telemetry cost."

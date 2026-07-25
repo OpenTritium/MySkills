@@ -51,6 +51,6 @@ fn load(path: &str, port: u16) -> Result<String, Error> {
 
 Check the error variant, `Display` output, source chain, boundary report, visibility, feature configuration, and public API stability. Test behavior and error contracts, not the exact generated selector implementation. Use `cargo expand` only to investigate macro output.
 
-Use `error-silence` for swallowed errors, panic sites, and duplicate logging; use `rust-ecosystem` for Snafu version, feature, MSRV, and dependency review.
+Use `rust-error-silence` for swallowed errors, panic sites, and duplicate logging; use `rust-ecosystem` for Snafu version, feature, MSRV, and dependency review.
 
 Official references: [Snafu guide](https://docs.rs/snafu/latest/snafu/guide/), [`Snafu` derive](https://docs.rs/snafu/latest/snafu/derive.Snafu.html), [`Whatever`](https://docs.rs/snafu/latest/snafu/struct.Whatever.html), and [the official repository](https://github.com/shepmaster/snafu).
