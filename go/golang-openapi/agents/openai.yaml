@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go OpenAPI with ogen"
+  short_description: "Type-safe OpenAPI 3.x Go code generation"
+  default_prompt: "Use $golang-openapi to design or review a type-safe OpenAPI 3.x Go API."

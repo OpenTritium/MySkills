@@ -1,49 +1,36 @@
 # MySkills
 
-Codex skills for Rust development, code review, and safe version-control workflows.
+面向 Codex 和其他 Agent 的开发 skills，包含：
 
-## Install with Bun
+- **Go**：代码质量、并发、数据库、依赖注入、GraphQL、gRPC、OpenAPI、测试、性能和可观测性
+- **Rust**：架构、异步并发、错误处理、类型设计、安全、测试和性能审查
+- **HTTP/API**：公共 HTTP/JSON API 设计
+- **版本控制**：Git、Jujutsu 工作流
 
-This repository keeps skills under `rust/`, so pass `--full-depth` to the `skills` CLI.
+## 使用 Bun 安装
 
-List the available skills:
+当前系统中的 skills 目录分布如下：
 
-```bash
-bunx skills add OpenTritium/MySkills --list --full-depth
-```
+- 通用项目目录：`./.agents/skills`
+- 通用全局目录：`~/.agents/skills`
+- Codex 全局目录：`~/.codex/skills`
 
-Install every skill into the current project's Codex directory (`.agents/skills`):
+安装到当前项目的 `.agents/skills`：
 
 ```bash
 bunx skills add OpenTritium/MySkills \
-  --agent codex \
+  --agent universal \
   --skill '*' \
   --full-depth \
   --copy \
   --yes
 ```
 
-Install one skill:
+安装到通用全局目录 `~/.agents/skills`：
+
+> skills CLI 当前将 `cline` 的全局路径映射到 `~/.agents/skills`；这里使用 `cline` 只是为了写入通用目录。
 
 ```bash
-bunx skills add OpenTritium/MySkills \
-  --agent codex \
-  --skill log-level \
-  --full-depth \
-  --copy \
-  --yes
-```
-
-Verify the project installation:
-
-```bash
-bunx skills list --agent codex
-```
-
-Refresh the shared global `$HOME/.agents/skills` directory:
-
-```bash
-rm -rf "$HOME/.agents/skills"/*
 bunx skills add OpenTritium/MySkills \
   --global \
   --agent cline \
@@ -53,59 +40,28 @@ bunx skills add OpenTritium/MySkills \
   --yes
 ```
 
-The `cline` target is used here because this CLI agent maps its global skills directory to `$HOME/.agents/skills`.
+安装到 Codex 全局目录 `~/.codex/skills`：
 
-To refresh a dedicated project `.agents/skills` directory, remove its contents and run the install command again. Do not remove a shared directory that contains skills from other repositories.
+```bash
+bunx skills add OpenTritium/MySkills \
+  --global \
+  --agent codex \
+  --skill '*' \
+  --full-depth \
+  --copy \
+  --yes
+```
 
-## Organization
+只安装单个 skill，例如安装 `golang-graphql` 到 Codex：
 
-Skills remain under stable source roots, but the index groups them by the question they answer. Load one primary skill first and add a secondary skill only when the request crosses its documented boundary.
+```bash
+bunx skills add OpenTritium/MySkills \
+  --global \
+  --agent codex \
+  --skill golang-graphql \
+  --full-depth \
+  --copy \
+  --yes
+```
 
-### Language And Runtime
-
-- `async-concurrency` — async tasks, synchronization, cancellation, and backpressure
-- `encode-invariant` — type-level immutability and domain invariants
-- `error-silence` — Rust error propagation and panic boundaries
-- `resource-lifecycle` — ownership, cleanup, pools, transactions, and shutdown
-- `rust-snafu` — Snafu error types, context propagation, sources, and reporting
-- `rust-state-machine` — explicit Rust states, legal transitions, and invalid-state prevention
-- `unsafe-checker` — unsafe Rust and FFI soundness
-
-### Design And Architecture
-
-- `architecture-entropy-review` — architectural drift after large refactors
-- `stripe-api-design` — external HTTP/JSON API resource contracts and delivery semantics
-- `rust-method-placement` — choose methods, extension traits, newtypes, or free functions
-- `rust-api-consolidation` — merge or remove Rust APIs while preserving real seams
-- `rust-ecosystem` — Cargo, crate integration, features, compatibility, and dependency risk
-- `rust-structure-refactor` — function, struct, and module-boundary refactoring
-
-### Review And Clarity
-
-- `big-o-optimizer` — algorithm complexity and data structures
-- `concurrency-testing` — deterministic interleaving tests for concurrent behavior
-- `func-smell` — function and method design
-- `high-snr-comment` — comments and documentation signal quality
-- `high-snr-log` — structured log content and noise
-- `log-level` — tracing levels and OpenTelemetry semantics
-- `naming-smell` — variable, function, and type naming
-- `rust-guard-clauses` — fail-fast guards, `let-else`, `?`, and shallow control flow
-- `rust-import-hygiene` — Rust `use` imports, qualified paths, enum globs, and aliases
-- `testing-strategy` — behavioral, deterministic, async, property, and integration tests
-- `zero-alloc` — avoidable allocations in Rust hot paths
-
-### Version Control
-
-- `vcs-router` — detect Git or Jujutsu before VCS operations
-- `jujutsu` — safe Jujutsu workflows after backend detection
-- `jujutsu-parallel` — parallel Jujutsu workspaces for multiple agents
-
-See [test-triggers.md](test-triggers.md) for primary skill ownership and overlap boundaries. See [AGENTS.md](AGENTS.md) for contribution and validation rules.
-
-## Adding Or Updating A Skill
-
-1. Give the skill one primary contract and a trigger description.
-2. Add it to the appropriate organization category.
-3. Add representative trigger cases and document any secondary boundary.
-4. Keep the body concise and link conditional detail instead of duplicating it.
-5. Run the skill validator before handoff.
+项目级安装时去掉 `--global`；项目级 `universal` 和 `codex` 都写入 `./.agents/skills`，全局安装则分别写入各自的全局目录。
