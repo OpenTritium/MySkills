@@ -105,6 +105,18 @@ Use this matrix to keep skill ownership explicit. Each query should have one pri
 | Run status, diff, log, mutation, or workspace operations after `vcs=jj` is selected | `jujutsu` | `vcs-router` for detection; `jujutsu-parallel` for parallel workspaces |
 | Coordinate multiple agents in Jujutsu workspaces | `jujutsu-parallel` | `vcs-router` for detection and `jujutsu` for the base workflow |
 
+## .NET
+
+| Query | Primary skill | Secondary boundary |
+|---|---|---|
+| Add or review .NET 10 ASP.NET Core controller/minimal API endpoints, DTOs, OpenAPI metadata, or ProblemDetails | `dotnet-webapi` | `stripe-api-design` for the language-neutral resource and wire contract; a persistence skill for storage details |
+| Design resource semantics, idempotency, pagination, versioning, or webhook behavior for a .NET 10 ASP.NET Core API | `stripe-api-design` | `dotnet-webapi` for C# endpoint and middleware implementation |
+| Run, filter, or diagnose the command used to execute .NET 10 TUnit tests | `run-tests` | `writing-tunit-tests` for test source |
+| Write or modernize .NET 10 TUnit assertions, data-driven cases, lifecycle, or async tests | `writing-tunit-tests` | `run-tests` for execution; a test-audit skill for broad quality findings |
+| Resolve .NET 10 trimming or Native AOT analyzer warnings | `dotnet-aot-compat` | none |
+| Audit or fix .NET 10 .csproj, .props, .targets, or Directory.Build MSBuild anti-patterns | `msbuild-antipatterns` | `dotnet-aot-compat` only for AOT-related project properties |
+| Analyze .NET 10 C# allocation, async, LINQ, regex, serialization, or I/O performance patterns | `analyzing-dotnet-performance` | use an algorithm skill for complexity |
+
 ## Maintenance Rules
 
 - Add a query when a new skill is introduced or a trigger boundary changes.

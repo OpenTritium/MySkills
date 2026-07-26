@@ -1,0 +1,4 @@
+interface:
+  display_name: ".NET AOT Compatibility"
+  short_description: "Resolve trimming and Native AOT warnings"
+  default_prompt: "Use $dotnet-aot-compat to make this .NET project pass trimming and Native AOT analysis."

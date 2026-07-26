@@ -1,0 +1,4 @@
+interface:
+  display_name: "Run TUnit Tests"
+  short_description: "Choose and run the right TUnit command"
+  default_prompt: "Use $run-tests to choose the exact TUnit command for this project and test scope."

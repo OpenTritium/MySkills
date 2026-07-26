@@ -1,0 +1,4 @@
+interface:
+  display_name: "ASP.NET Core Web API"
+  short_description: "Build and review ASP.NET Core APIs"
+  default_prompt: "Use $dotnet-webapi to build or review an ASP.NET Core Web API endpoint."

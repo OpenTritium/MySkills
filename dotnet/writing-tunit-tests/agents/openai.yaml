@@ -1,0 +1,4 @@
+interface:
+  display_name: "Writing TUnit Tests"
+  short_description: "Write reliable async TUnit tests"
+  default_prompt: "Use $writing-tunit-tests to write or fix these TUnit tests."

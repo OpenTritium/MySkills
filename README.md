@@ -44,3 +44,44 @@ bunx skills add OpenTritium/MySkills \
   --copy \
   --yes
 ```
+
+## 技能索引
+
+本项目按领域维护 skills；目录名是安装路径，frontmatter 中的 `name` 是
+触发名称。`.NET 10` 子集精选自 [dotnet/skills](https://github.com/dotnet/skills)，
+仅保留可独立使用且与本项目现有职责边界清晰的能力。
+
+### .NET
+
+- `dotnet-webapi`：ASP.NET Core 10 endpoint、DTO、OpenAPI 和错误处理
+- `run-tests`：构造正确的 .NET 10 TUnit 运行和过滤命令
+- `writing-tunit-tests`：编写可靠的 .NET 10 异步 TUnit 测试与断言
+- `dotnet-aot-compat`：处理 .NET 10 trimming 和 Native AOT 分析警告
+- `msbuild-antipatterns`：审查 .NET 10 MSBuild 项目文件反模式
+- `analyzing-dotnet-performance`：基于证据分析 .NET 10 性能风险
+
+### Go
+
+`golang-benchmark`、`golang-cli`、`golang-code-style`、`golang-concurrency`、
+`golang-context`、`golang-continuous-integration`、`golang-data-structures`、
+`golang-database`、`golang-dependency-injection`、`golang-dependency-management`、
+`golang-design-patterns`、`golang-documentation`、`golang-error-handling`、
+`golang-gopls`、`golang-graphql`、`golang-grpc`、`golang-lint`、`golang-modernize`、
+`golang-naming`、`golang-observability`、`golang-openapi`、`golang-performance`、
+`golang-project-layout`、`golang-refactoring`、`golang-safety`、`golang-security`、
+`golang-structs-interfaces`、`golang-testing`、`golang-troubleshooting`
+
+### Rust
+
+`rust-api-consolidation`、`rust-architecture-entropy-review`、`rust-async-concurrency`、
+`rust-big-o-optimizer`、`rust-concurrency-testing`、`rust-ecosystem`、
+`rust-encode-invariant`、`rust-error-silence`、`rust-func-smell`、`rust-guard-clauses`、
+`rust-high-snr-comment`、`rust-import-hygiene`、`rust-logging-review`、
+`rust-method-placement`、`rust-naming-smell`、`rust-resource-lifecycle`、`rust-snafu`、
+`rust-state-machine`、`rust-structure-refactor`、`rust-testing-strategy`、
+`rust-tracing-context`、`rust-unsafe-checker`、`rust-zero-alloc`
+
+### HTTP、Jujutsu 和通用
+
+- `stripe-api-design`：公共 HTTP/JSON API 和 webhook wire contract
+- `jujutsu`、`jujutsu-parallel`、`vcs-router`：版本控制后端与 Jujutsu 工作流

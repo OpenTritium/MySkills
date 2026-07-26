@@ -1,0 +1,4 @@
+interface:
+  display_name: "MSBuild Anti-Patterns"
+  short_description: "Review and fix MSBuild project file issues"
+  default_prompt: "Use $msbuild-antipatterns to audit these MSBuild project and build files."

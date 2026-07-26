@@ -1,0 +1,4 @@
+interface:
+  display_name: ".NET Performance Analysis"
+  short_description: "Find measurable .NET performance risks"
+  default_prompt: "Use $analyzing-dotnet-performance to audit this C# code for evidence-based performance issues."
