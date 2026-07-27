@@ -36,7 +36,7 @@ Use this skill only after `vcs-router` confirms `vcs=jj`. The workflow is checke
 The following sections apply only when `vcs=jj`.
 
 - The repository graph is the source of truth; the working copy is a commit, referenced as @.
-- All current working-copy changes are in `@`; there is no staging area. `jj commit -m "message"` without filesets selects all changes in `@` and starts a new working-copy revision.
+- All current working-copy changes are in `@`; there is no staging area. `jj commit -m "message"` without filesets selects all file changes in the working-copy revision `@` and starts a new working-copy revision. It does not inspect or separate logical domains for you.
 - Most jj commands snapshot the working copy at the beginning, record an operation, and update the working copy afterward.
 - Treat `jj commit` as a whole-`@` operation unless explicit filesets are provided; use `jj split` for a deliberate, reviewable path-based extraction.
 - Change IDs remain stable when a change is rewritten; commit IDs change. Prefer change IDs when referring to work.
@@ -91,6 +91,29 @@ If the selected and remaining changes overlap in one file, path-based splitting 
 
 `jj split` normally moves bookmarks from the old revision to the new child. If the bookmark should identify the selected revision instead, move it explicitly only after reviewing the resulting graph.
 
+### Commit Decision Gate
+
+Do not use the whole-`@` form of `jj commit` until you have confirmed that `@` contains one logical change. Before committing, inspect:
+
+       jj st
+       jj --no-pager diff --from @- --to @ --stat
+       jj --no-pager diff --from @- --to @ --name-only
+       jj --no-pager log -r '@- | @'
+
+If the status or diff shows multiple logical changes, split the exact paths first and review both resulting revisions. `jj split` takes filesets as positional arguments; in jj 0.43 it does not use a `--path` option:
+
+       jj split -r @ -m "Selected change" -- \
+         'root:src/selected-area' \
+         'root:tests/selected-area'
+
+Then verify the selected revision and the remaining working-copy revision before committing the remainder:
+
+       jj st
+       jj --no-pager diff --name-only -r @
+       jj --no-pager log -r '<base-change-id>::@'
+
+Only after `@` represents one logical change should you run `jj commit -m "message"`. If related changes overlap in one file, path splitting is not sufficient; resolve that boundary deliberately before rewriting.
+
 ### Inspect History and Changes
 
        jj --no-pager log
@@ -103,7 +126,7 @@ The default diff is side-by-side; use --git for unified +/- output. Use change I
 
 ### Refine Changes
 
-Keep one logical change per revision. Use:
+Keep one logical change per revision. First pass the commit decision gate above. Use:
 
        jj desc -m "message"
        jj commit -m "message"
@@ -205,8 +228,8 @@ Alternatively edit the conflict files directly in the conflicted working copy. D
 | Diff | jj --no-pager diff --git |
 | New revision | jj new -m "message" |
 | Describe | jj desc -m "message" |
-| Commit all current @ changes and start next | jj commit -m "message" |
-| Split selected paths | jj split -r @ -m "message" -- <filesets> |
+| Commit a confirmed single logical @ change and start next | jj commit -m "message" |
+| Split a mixed @ revision before committing | jj split -r @ -m "message" -- <filesets> |
 | Edit revision | jj edit <change-id> |
 | Show evolution | jj --no-pager evolog <change-id> |
 | Duplicate | jj duplicate <change-id> |
