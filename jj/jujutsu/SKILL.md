@@ -1,6 +1,6 @@
 ---
 name: jujutsu
-description: "Operate safely on a Jujutsu repository after `vcs-router` detects `vcs=jj`. Use for Jujutsu status, diff, log, commit, branch, rebase, push, restore, bookmark, workspace, and conflict operations. Do not use for Git-only repositories; use `vcs-router` first and `jujutsu-parallel` only for parallel Jujutsu workspaces. 中文触发：Jujutsu、jj、变更、书签、工作区、冲突、并行工作区。"
+description: "Operate safely on a Jujutsu repository after `vcs-router` detects `vcs=jj`. Use for Jujutsu status, diff, log, commit, selective path splitting, branch, rebase, push, restore, bookmark, workspace, and conflict operations, including mixed working-copy changes. Do not use for Git-only repositories; use `vcs-router` first and `jujutsu-parallel` only for parallel Jujutsu workspaces. 中文触发：Jujutsu、jj、变更、按路径拆分、混合工作区、书签、工作区、冲突、并行工作区。"
 allowed-tools:
   - Bash(jj *)
 ---
@@ -27,8 +27,8 @@ Use this skill only after `vcs-router` confirms `vcs=jj`. The workflow is checke
        jj commit -m "message"
        jj squash -m "message"
 
-5. Run `jj st` after Jujutsu mutations such as commit, squash, abandon, rebase, restore, undo, or bookmark changes.
-6. Avoid interactive commands in an agent environment: jj split, jj squash -i, diff editors, and external jj resolve tools. Edit conflict files directly when practical.
+5. Before every mutation, inspect `jj st`, the complete working-copy diff, and the intended graph. After every mutation, run `jj st` and a targeted diff or log check; do not batch a chain of rewrites.
+6. Avoid interactive commands in an agent environment: `jj split` without explicit filesets, `jj squash -i`, diff editors, and external jj resolve tools. Use the non-interactive split workflow below when exact paths are sufficient.
 7. Do not push unless the user explicitly asks. Before pushing, inspect jj status, log, diff, and bookmark state.
 
 ## Core Model
@@ -36,8 +36,9 @@ Use this skill only after `vcs-router` confirms `vcs=jj`. The workflow is checke
 The following sections apply only when `vcs=jj`.
 
 - The repository graph is the source of truth; the working copy is a commit, referenced as @.
+- All current working-copy changes are in `@`; there is no staging area. `jj commit -m "message"` without filesets selects all changes in `@` and starts a new working-copy revision.
 - Most jj commands snapshot the working copy at the beginning, record an operation, and update the working copy afterward.
-- There is no staging area. jj commit exists, but it is optional; use it deliberately to describe the current revision and create a new working-copy revision.
+- Treat `jj commit` as a whole-`@` operation unless explicit filesets are provided; use `jj split` for a deliberate, reviewable path-based extraction.
 - Change IDs remain stable when a change is rewritten; commit IDs change. Prefer change IDs when referring to work.
 - Revisions are mutable. Conflicts can be recorded in commits, descendants may be automatically rebased, and operations can be inspected or undone.
 
@@ -51,11 +52,44 @@ Inspect the current revision before editing:
 
        jj st
 
-If the working-copy commit contains unrelated work, create a new revision:
+If the working-copy commit contains unrelated work before editing, create a new revision:
 
        jj new -m "Describe the new change"
 
 Changes made in the working copy are automatically included in the current revision. Use jj desc -m when describing an existing revision.
+
+### Split a Mixed Working-Copy Revision
+
+Use this workflow when `@` already contains multiple logical changes and only a subset should become a separate revision. Decide the final graph before rewriting it:
+
+       base -> selected change -> remaining WIP (@)
+
+Do the following preflight without mutating the repository:
+
+       jj st
+       jj --no-pager diff --from @- --to @ --stat
+       jj --no-pager diff --from @- --to @ --name-only
+       jj --no-pager log -r '@- | @'
+
+Record the current `@` change ID, its parent change ID, and the exact paths to select. A path fileset is cwd-relative by default, so either work from the repository root or use `root:`/`root-file:` explicitly. Quote filesets, especially those containing operators or glob characters. Do not select a directory by a guessed basename when an exact root-relative path is available.
+
+Use this non-interactive form; supplying filesets avoids the diff editor:
+
+       jj split -r @ -m "Selected change" -- \
+         'root:src/cdc-engine-pod' \
+         'root:tests/cdc-engine-pod'
+
+The selected paths become the lower revision and the unselected paths remain in the new child, which should be the working-copy revision. Immediately verify both sides and the graph:
+
+       jj st
+       jj --no-pager log -r '<base-change-id>::@'
+       jj --no-pager diff --stat -r <selected-change-id>
+       jj --no-pager diff --name-only -r @
+       jj --no-pager bookmark list
+
+If the selected and remaining changes overlap in one file, path-based splitting cannot separate hunks safely. Stop and resolve that boundary deliberately before rewriting history. If the graph or path sets differ from the plan, stop; inspect the operation and use `jj undo` only after confirming the latest operation is the mistaken one.
+
+`jj split` normally moves bookmarks from the old revision to the new child. If the bookmark should identify the selected revision instead, move it explicitly only after reviewing the resulting graph.
 
 ### Inspect History and Changes
 
@@ -75,6 +109,7 @@ Keep one logical change per revision. Use:
        jj commit -m "message"
        jj new -m "message"
        jj squash -m "message"
+       jj split -r @ -m "message" -- <filesets>
        jj absorb
        jj rebase -r <change-id> -d <destination>
        jj rebase -s <change-id> -o <destination>
@@ -170,7 +205,8 @@ Alternatively edit the conflict files directly in the conflicted working copy. D
 | Diff | jj --no-pager diff --git |
 | New revision | jj new -m "message" |
 | Describe | jj desc -m "message" |
-| Commit and start next | jj commit -m "message" |
+| Commit all current @ changes and start next | jj commit -m "message" |
+| Split selected paths | jj split -r @ -m "message" -- <filesets> |
 | Edit revision | jj edit <change-id> |
 | Show evolution | jj --no-pager evolog <change-id> |
 | Duplicate | jj duplicate <change-id> |
