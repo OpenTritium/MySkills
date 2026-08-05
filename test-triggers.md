@@ -102,6 +102,7 @@ Use this matrix to keep skill ownership explicit. Each query should have one pri
 ## Version Control
 
 | Detect the repository backend before a status, diff, log, mutation, or workspace operation | `vcs-router` | `jujutsu` only when it returns `vcs=jj` |
+| Choose or review commit-message, branch/bookmark, or workspace naming rules for Git or Jujutsu | `vcs-naming` | `vcs-router` for backend detection; `jujutsu` for operations; `jujutsu-parallel` for concurrent workspace coordination |
 | Run status, diff, log, mutation, or workspace operations after `vcs=jj` is selected | `jujutsu` | `vcs-router` for detection; `jujutsu-parallel` for parallel workspaces |
 | Inspect a Jujutsu working-copy revision before committing; split mixed logical changes by exact filesets and validate the resulting graph | `jujutsu` | `vcs-router` for detection; `jujutsu-parallel` for multiple workspaces |
 | Coordinate multiple agents in Jujutsu workspaces | `jujutsu-parallel` | `vcs-router` for detection and `jujutsu` for the base workflow |

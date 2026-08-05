@@ -84,4 +84,5 @@ bunx skills add OpenTritium/MySkills \
 ### HTTP、Jujutsu 和通用
 
 - `stripe-api-design`：公共 HTTP/JSON API 和 webhook wire contract
+- `vcs-naming`：Git commit、branch、jj bookmark 和 workspace 的命名规范
 - `jujutsu`、`jujutsu-parallel`、`vcs-router`：版本控制后端与 Jujutsu 工作流

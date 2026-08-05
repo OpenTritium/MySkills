@@ -1,0 +1,4 @@
+interface:
+  display_name: "VCS Naming Conventions"
+  short_description: "Name commits, branches, bookmarks, and workspaces consistently"
+  default_prompt: "Use $vcs-naming when choosing or reviewing Git/Jujutsu names."
